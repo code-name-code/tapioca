@@ -2,6 +2,7 @@ package hr.garnet.gapi;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
+import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class ApiRequest extends HttpServletRequestWrapper {
 
   public ApiRequest(HttpServletRequest request, String mapping) {
     super(request);
-    String matchedValue = getMatchedValue(request, mapping);
+    String matchedValue = getMatchedValue(request.getHttpServletMapping());
     this.pathMatcher = Pattern.compile(mapping).matcher(matchedValue);
   }
 
@@ -37,11 +38,11 @@ public class ApiRequest extends HttpServletRequestWrapper {
     }
   }
 
-  public static String getMatchedValue(HttpServletRequest req, String mapping) {
-    int offset = mapping.startsWith("/") ? 0 : 1;
-    String basePath = req.getContextPath() + req.getServletPath();
-    return basePath.equals(req.getRequestURI())
-        ? req.getRequestURI()
-        : req.getRequestURI().substring(basePath.length() + offset);
+  public static String getMatchedValue(HttpServletMapping httpServletMapping) {
+    return switch (httpServletMapping.getMappingMatch()) {
+      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire command mapped to ""
+      case PATH -> httpServletMapping.getMatchValue();
+      default -> null;
+    };
   }
 }
