@@ -36,10 +36,8 @@ public class ApiServlet extends HttpServlet {
     for (String mapping : commandMappings.keySet()) {
       String matchedValue = ApiRequest.getMatchedValue(req, mapping);
       if (matchedValue.matches(mapping)) {
-
         Class<? extends ApiCommand> commandClass = commandMappings.get(mapping);
         commandMappingFound = true;
-
         try {
           ApiSCBindings.getCommandProvider(req.getServletContext())
               .apply(commandClass)
