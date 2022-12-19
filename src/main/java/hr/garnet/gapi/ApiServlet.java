@@ -1,4 +1,4 @@
-package hr.garnet.web.gapi;
+package hr.garnet.gapi;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

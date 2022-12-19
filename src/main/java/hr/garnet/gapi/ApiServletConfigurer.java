@@ -1,4 +1,4 @@
-package hr.garnet.web.gapi;
+package hr.garnet.gapi;
 
 import jakarta.servlet.MultipartConfigElement;
 import java.util.Map;

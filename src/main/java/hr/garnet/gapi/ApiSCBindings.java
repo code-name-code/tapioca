@@ -1,4 +1,4 @@
-package hr.garnet.web.gapi;
+package hr.garnet.gapi;
 
 import jakarta.servlet.ServletContext;
 import java.util.function.BiFunction;

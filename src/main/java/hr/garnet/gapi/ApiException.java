@@ -1,4 +1,4 @@
-package hr.garnet.web.gapi;
+package hr.garnet.gapi;
 
 public class ApiException extends RuntimeException {
 

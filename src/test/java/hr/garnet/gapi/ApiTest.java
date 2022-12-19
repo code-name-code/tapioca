@@ -1,12 +1,8 @@
-package hr.garnet.api;
+package hr.garnet.gapi;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import hr.garnet.web.gapi.Api;
-import hr.garnet.web.gapi.ApiCommand;
-import hr.garnet.web.gapi.ApiRequest;
-import hr.garnet.web.gapi.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
