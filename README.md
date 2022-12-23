@@ -1,7 +1,7 @@
 # GAPI (Garnet API)
 
 ## Prerequisites
-* JDK 19+
+* JDK 17+
 
 ## Usage example
 ```java
