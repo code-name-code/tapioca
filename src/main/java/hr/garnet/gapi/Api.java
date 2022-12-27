@@ -14,6 +14,7 @@ public abstract class Api implements ServletContextListener {
   private Function<Class<? extends ApiCommand>, ApiCommand> commandProvider;
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
+  private ApiExceptionHandler exceptionHandler;
 
   protected void setCommandProvider(
       Function<Class<? extends ApiCommand>, ApiCommand> commandProvider) {
@@ -26,6 +27,10 @@ public abstract class Api implements ServletContextListener {
 
   protected void setJsonWriter(Function<Object, String> jsonWriter) {
     this.jsonWriter = jsonWriter;
+  }
+
+  protected void setExceptionHandler(ApiExceptionHandler exceptionHandler) {
+    this.exceptionHandler = exceptionHandler;
   }
 
   protected void filter(Filter filter, String... urlPatterns) {
@@ -59,6 +64,7 @@ public abstract class Api implements ServletContextListener {
     sc.setAttribute(ApiSCBindings.SC_JSON_READER, jsonReader);
     sc.setAttribute(ApiSCBindings.SC_JSON_WRITER, jsonWriter);
     sc.setAttribute(ApiSCBindings.SC_COMMAND_PROVIDER, commandProvider);
+    sc.setAttribute(ApiSCBindings.SC_EXCEPTION_HANDLER, exceptionHandler);
   }
 
   private void addFilters(ServletContext sc) {

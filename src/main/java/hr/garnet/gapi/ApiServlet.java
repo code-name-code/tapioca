@@ -3,6 +3,7 @@ package hr.garnet.gapi;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 public class ApiServlet extends HttpServlet {
@@ -36,14 +37,25 @@ public class ApiServlet extends HttpServlet {
     for (String mapping : commandMappings.keySet()) {
       String matchedValue = ApiRequest.getMatchedValue(req.getHttpServletMapping());
       if (matchedValue.matches(mapping)) {
+        ApiRequest apiReq = new ApiRequest(req, mapping);
+        ApiResponse apiResp = new ApiResponse(req, resp);
         Class<? extends ApiCommand> commandClass = commandMappings.get(mapping);
         commandMappingFound = true;
         try {
           ApiSCBindings.getCommandProvider(req.getServletContext())
               .apply(commandClass)
-              .execute(new ApiRequest(req, mapping), new ApiResponse(req, resp));
-        } catch (ApiException e) {
-          resp.setStatus(e.getStatus());
+              .execute(apiReq, apiResp);
+        } catch (Exception e) {
+          ApiSCBindings.getExceptionHandler(req.getServletContext())
+              .ifPresent(
+                  eh -> {
+                    eh.handleException(e, apiReq, apiResp);
+                    try {
+                      apiResp.flushBuffer();
+                    } catch (IOException ignored) {
+
+                    }
+                  });
         }
       }
     }

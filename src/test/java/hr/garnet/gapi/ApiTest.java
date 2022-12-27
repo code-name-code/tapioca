@@ -28,6 +28,13 @@ public class ApiTest {
     public String brand;
   }
 
+  public static class ThrowEx implements ApiCommand {
+    @Override
+    public void execute(ApiRequest req, ApiResponse resp) {
+      throw new IllegalArgumentException("Illegal argument");
+    }
+  }
+
   public static class GetAllCars implements ApiCommand {
     @Override
     public void execute(ApiRequest req, ApiResponse resp) {
@@ -134,6 +141,16 @@ public class ApiTest {
             }
           });
 
+      setExceptionHandler(
+          (e, req, resp) -> {
+            try {
+              resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+              resp.getWriter().write(e.getMessage());
+            } catch (IOException ignored) {
+
+            }
+          });
+
       filter(
           (servletRequest, servletResponse, filterChain) -> {
             ((HttpServletResponse) servletResponse).setHeader("X-Served-By", "GAPI");
@@ -144,6 +161,7 @@ public class ApiTest {
       serve(
           api -> {
             api.get("", GetAllCars.class);
+            api.get("throwex", ThrowEx.class);
             api.get("(?<brand>\\w+)", GetCarByBrand.class);
             api.post("", CreateCar.class);
             api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
@@ -287,5 +305,18 @@ public class ApiTest {
         HttpClient.newHttpClient().send(updateCar, HttpResponse.BodyHandlers.ofString());
 
     assertEquals("Head", response.headers().map().get("X-Method").get(0));
+  }
+
+  @Test
+  @Order(10)
+  public void should_use_exception_handler() throws IOException, InterruptedException {
+    HttpRequest throwex =
+        HttpRequest.newBuilder(uri.resolve("cars/").resolve("throwex")).GET().build();
+
+    HttpResponse<String> response =
+        HttpClient.newHttpClient().send(throwex, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(500, response.statusCode());
+    assertEquals("Illegal argument", response.body());
   }
 }
