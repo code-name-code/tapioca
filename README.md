@@ -10,6 +10,8 @@
 // This example shows usage without using DI
 // For more detailed examples check ApiTest
 
+import hr.garnet.gapi.ApiBindings;
+
 public class HelloWorldCommand implements ApiCommand {
     @Override
     public void execute(ApiRequest req, ApiResponse resp) {
@@ -51,10 +53,15 @@ public class GarnetApi extends Api {
         setJsonReader((s, aClass) -> jsonb.fromJson(s, aClass));
         setJsonWriter(jsonb::toJson);
 
+        bind("key", "Binds anything to the servlet context as attribute");
+
         // Define filter for /*
         filter(
-                (servletRequest, servletResponse, filterChain) ->
-                        filterChain.doFilter(servletRequest, servletResponse),
+                (servletRequest, servletResponse, filterChain) -> {
+                    // Print bound servlet context key
+                    System.out.println(ApiBindings.<String>get("key"));
+                    filterChain.doFilter(servletRequest, servletResponse);
+                },
                 "/*");
 
         // Define servlet (you can have as many as you like)

@@ -1,6 +1,5 @@
 package hr.garnet.gapi;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
@@ -8,11 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 public class ApiResponse extends HttpServletResponseWrapper {
 
-  private final HttpServletRequest request;
-
-  public ApiResponse(HttpServletRequest request, HttpServletResponse response) {
+  public ApiResponse(HttpServletResponse response) {
     super(response);
-    this.request = request;
   }
 
   public void send(int status, String contentType, byte[] data) {
@@ -32,6 +28,6 @@ public class ApiResponse extends HttpServletResponseWrapper {
   }
 
   private String json(Object data) {
-    return ApiSCBindings.getJsonWriter(request.getServletContext()).apply(data);
+    return ApiBindings.getJsonWriter().apply(data);
   }
 }

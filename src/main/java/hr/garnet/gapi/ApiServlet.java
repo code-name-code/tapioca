@@ -38,7 +38,7 @@ public class ApiServlet extends HttpServlet {
       String matchedValue = ApiRequest.getMatchedValue(req.getHttpServletMapping());
       if (matchedValue.matches(mapping)) {
         ApiRequest apiReq = new ApiRequest(req, mapping);
-        ApiResponse apiResp = new ApiResponse(req, resp);
+        ApiResponse apiResp = new ApiResponse(resp);
         ApiCommandHolder apiCommandHolder = commandMappings.get(mapping);
         ApiCommand command;
         commandMappingFound = true;
@@ -46,16 +46,14 @@ public class ApiServlet extends HttpServlet {
           if (apiCommandHolder.containsImplementation()) {
             command = apiCommandHolder.getCommandImpl();
           } else {
-            command =
-                ApiSCBindings.getCommandProvider(req.getServletContext())
-                    .apply(apiCommandHolder.getCommandClass());
+            command = ApiBindings.getCommandProvider().apply(apiCommandHolder.getCommandClass());
           }
           command.execute(apiReq, apiResp);
           if (!resp.isCommitted()) {
             resp.flushBuffer();
           }
         } catch (Exception e) {
-          ApiSCBindings.getExceptionHandler(req.getServletContext())
+          ApiBindings.getExceptionHandler()
               .ifPresent(
                   eh -> {
                     eh.handleException(e, apiReq, apiResp);

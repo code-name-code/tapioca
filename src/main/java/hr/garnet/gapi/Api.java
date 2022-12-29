@@ -15,6 +15,7 @@ public abstract class Api implements ServletContextListener {
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
   private ApiExceptionHandler exceptionHandler;
+  private Map<String, Object> contextObjects = new HashMap<>();
 
   protected void setCommandProvider(
       Function<Class<? extends ApiCommand>, ApiCommand> commandProvider) {
@@ -31,6 +32,10 @@ public abstract class Api implements ServletContextListener {
 
   protected void setExceptionHandler(ApiExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
+  }
+
+  protected void bind(String key, Object o) {
+    contextObjects.putIfAbsent(key, o);
   }
 
   protected void filter(Filter filter, String... urlPatterns) {
@@ -54,6 +59,8 @@ public abstract class Api implements ServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent sce) {
+    ApiBindings.setServletContext(sce.getServletContext());
+
     configure();
     addToServletContext(sce.getServletContext());
     addFilters(sce.getServletContext());
@@ -61,10 +68,12 @@ public abstract class Api implements ServletContextListener {
   }
 
   private void addToServletContext(ServletContext sc) {
-    sc.setAttribute(ApiSCBindings.SC_JSON_READER, jsonReader);
-    sc.setAttribute(ApiSCBindings.SC_JSON_WRITER, jsonWriter);
-    sc.setAttribute(ApiSCBindings.SC_COMMAND_PROVIDER, commandProvider);
-    sc.setAttribute(ApiSCBindings.SC_EXCEPTION_HANDLER, exceptionHandler);
+    sc.setAttribute(ApiBindings.SC_JSON_READER, jsonReader);
+    sc.setAttribute(ApiBindings.SC_JSON_WRITER, jsonWriter);
+    sc.setAttribute(ApiBindings.SC_COMMAND_PROVIDER, commandProvider);
+    sc.setAttribute(ApiBindings.SC_EXCEPTION_HANDLER, exceptionHandler);
+
+    contextObjects.forEach(sc::setAttribute);
   }
 
   private void addFilters(ServletContext sc) {

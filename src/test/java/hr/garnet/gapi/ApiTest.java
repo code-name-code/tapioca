@@ -151,6 +151,8 @@ public class ApiTest {
             }
           });
 
+      bind("key", "ok");
+
       filter(
           (servletRequest, servletResponse, filterChain) -> {
             ((HttpServletResponse) servletResponse).setHeader("X-Served-By", "GAPI");
@@ -160,11 +162,19 @@ public class ApiTest {
 
       serve(
           api -> {
-            api.get("", GetAllCars.class);
             api.get(
-                "inlineImpl",
-                (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
+                "contextObject",
+                (req, resp) ->
+                    resp.send(200, "text/plain", ApiBindings.<String>get("key").getBytes()));
+            api.get(
+                "inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
             api.get("throwex", ThrowEx.class);
+          },
+          "/exts/*");
+
+      serve(
+          api -> {
+            api.get("", GetAllCars.class);
             api.get("(?<brand>\\w+)", GetCarByBrand.class);
             api.post("", CreateCar.class);
             api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
@@ -299,22 +309,22 @@ public class ApiTest {
     assertEquals(SC_NO_CONTENT, response.statusCode());
   }
 
-//  @Test
-//  @Order(9)
-//  public void should_map_head_method() throws IOException, InterruptedException {
-//    HttpRequest updateCar = HttpRequest.newBuilder(uri.resolve("cars/")).HEAD().build();
-//
-//    HttpResponse<String> response =
-//        HttpClient.newHttpClient().send(updateCar, HttpResponse.BodyHandlers.ofString());
-//
-//    assertEquals("Head", response.headers().map().get("X-Method").get(0));
-//  }
+  @Test
+  @Order(9)
+  public void should_map_head_method() throws IOException, InterruptedException {
+    HttpRequest updateCar = HttpRequest.newBuilder(uri.resolve("cars/")).HEAD().build();
+
+    HttpResponse<String> response =
+        HttpClient.newHttpClient().send(updateCar, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals("Head", response.headers().map().get("X-Method").get(0));
+  }
 
   @Test
   @Order(10)
   public void should_use_exception_handler() throws IOException, InterruptedException {
     HttpRequest throwex =
-        HttpRequest.newBuilder(uri.resolve("cars/").resolve("throwex")).GET().build();
+        HttpRequest.newBuilder(uri.resolve("exts/").resolve("throwex")).GET().build();
 
     HttpResponse<String> response =
         HttpClient.newHttpClient().send(throwex, HttpResponse.BodyHandlers.ofString());
@@ -326,13 +336,26 @@ public class ApiTest {
   @Test
   @Order(11)
   public void should_use_inline_command_implementation() throws IOException, InterruptedException {
-    HttpRequest throwex =
-            HttpRequest.newBuilder(uri.resolve("cars/").resolve("inlineImpl")).GET().build();
+    HttpRequest inlineImpl =
+        HttpRequest.newBuilder(uri.resolve("exts/").resolve("inlineImpl")).GET().build();
 
     HttpResponse<String> response =
-            HttpClient.newHttpClient().send(throwex, HttpResponse.BodyHandlers.ofString());
+        HttpClient.newHttpClient().send(inlineImpl, HttpResponse.BodyHandlers.ofString());
 
     assertEquals(200, response.statusCode());
     assertEquals("inlineImpl", response.body());
+  }
+
+  @Test
+  @Order(12)
+  public void should_return_context_object() throws IOException, InterruptedException {
+    HttpRequest contextObject =
+        HttpRequest.newBuilder(uri.resolve("exts/").resolve("contextObject")).GET().build();
+
+    HttpResponse<String> response =
+        HttpClient.newHttpClient().send(contextObject, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(200, response.statusCode());
+    assertEquals("ok", response.body());
   }
 }

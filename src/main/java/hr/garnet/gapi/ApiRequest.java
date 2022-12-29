@@ -32,7 +32,7 @@ public class ApiRequest extends HttpServletRequestWrapper {
   public <T> T json(Class<T> clazz) {
     try {
       byte[] content = getInputStream().readAllBytes();
-      return (T) ApiSCBindings.getJsonReader(getServletContext()).apply(new String(content), clazz);
+      return (T) ApiBindings.getJsonReader().apply(new String(content), clazz);
     } catch (IOException e) {
       throw new ApiException(SC_BAD_REQUEST);
     }
