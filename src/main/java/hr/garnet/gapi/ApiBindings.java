@@ -40,6 +40,11 @@ public class ApiBindings {
     return (T) servletContext.getAttribute(key);
   }
 
+  /**
+   * This method should only be called by GAPI library.
+   *
+   * @param sc {@link ServletContext}
+   */
   public static void setServletContext(ServletContext sc) {
     if (Objects.isNull(servletContext)) {
       servletContext = sc;
