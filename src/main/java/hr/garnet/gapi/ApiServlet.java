@@ -16,7 +16,7 @@ public class ApiServlet extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
-    Map<String, Class<? extends ApiCommand>> commandMappings =
+    Map<String, ApiCommandHolder> commandMappings =
         switch (req.getMethod()) {
           case "GET" -> apiConfigurer.getGetMapping();
           case "POST" -> apiConfigurer.getPostMapping();
@@ -39,19 +39,30 @@ public class ApiServlet extends HttpServlet {
       if (matchedValue.matches(mapping)) {
         ApiRequest apiReq = new ApiRequest(req, mapping);
         ApiResponse apiResp = new ApiResponse(req, resp);
-        Class<? extends ApiCommand> commandClass = commandMappings.get(mapping);
+        ApiCommandHolder apiCommandHolder = commandMappings.get(mapping);
+        ApiCommand command;
         commandMappingFound = true;
         try {
-          ApiSCBindings.getCommandProvider(req.getServletContext())
-              .apply(commandClass)
-              .execute(apiReq, apiResp);
+          if (apiCommandHolder.containsImplementation()) {
+            command = apiCommandHolder.getCommandImpl();
+          } else {
+            command =
+                ApiSCBindings.getCommandProvider(req.getServletContext())
+                    .apply(apiCommandHolder.getCommandClass());
+          }
+          command.execute(apiReq, apiResp);
+          if (!resp.isCommitted()) {
+            resp.flushBuffer();
+          }
         } catch (Exception e) {
           ApiSCBindings.getExceptionHandler(req.getServletContext())
               .ifPresent(
                   eh -> {
                     eh.handleException(e, apiReq, apiResp);
                     try {
-                      apiResp.flushBuffer();
+                      if (!resp.isCommitted()) {
+                        resp.flushBuffer();
+                      }
                     } catch (IOException ignored) {
 
                     }
