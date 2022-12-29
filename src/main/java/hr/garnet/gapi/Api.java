@@ -21,18 +21,27 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public abstract class Api implements ServletContextListener {
 
-  private final List<ApiServletConfigurer> servlets = new ArrayList<>();
-  private final Set<ApiFilterDef> filters = new LinkedHashSet<>();
+  private final List<ApiServletConfigurer> servlets;
+  private final Set<ApiFilterDef> filters;
+  private final Map<String, Object> contextObjects;
+  private final Map<String, String> initParameters;
 
   private Function<Class<? extends ApiCommand>, ApiCommand> commandProvider;
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
   private ApiExceptionHandler exceptionHandler;
-  private final Map<String, Object> contextObjects = new HashMap<>();
-  private final Map<String, String> initParameters = new HashMap<>();
+
+  public Api() {
+    this.contextObjects = new HashMap<>();
+    this.initParameters = new HashMap<>();
+    this.servlets = new ArrayList<>();
+    this.filters = new LinkedHashSet<>();
+  }
 
   protected abstract void configure();
 
