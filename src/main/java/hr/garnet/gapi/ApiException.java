@@ -1,6 +1,10 @@
 package hr.garnet.gapi;
 
 /**
+ * {@link ApiServlet} knows how to handle these kind of exceptions. If there is no global exception
+ * handler defined and {@link ApiException} is thrown inside {@link ApiCommand}, {@link ApiServlet}
+ * will write status and message received from the caught exception to the response output stream.
+ *
  * @author vedransmid@gmail.com
  */
 public class ApiException extends RuntimeException {

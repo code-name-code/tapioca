@@ -2,8 +2,6 @@ package hr.garnet.gapi;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
-import hr.garnet.gapi.ApiBindings;
-import hr.garnet.gapi.ApiException;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -13,6 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Wrapper around {@link HttpServletRequest} which provides some additional, convenient methods out
+ * of the box.
+ *
  * @author vedransmid@gmail.com
  */
 public class ApiRequest extends HttpServletRequestWrapper {
@@ -25,6 +26,10 @@ public class ApiRequest extends HttpServletRequestWrapper {
     this.pathMatcher = Pattern.compile(mapping).matcher(matchedValue);
   }
 
+  /**
+   * @param name Path parameter name.
+   * @return Path parameter value for the provided path parameter name.
+   */
   public Optional<String> getPathParam(String name) {
     try {
       boolean match = pathMatcher.find();
@@ -34,6 +39,14 @@ public class ApiRequest extends HttpServletRequestWrapper {
     }
   }
 
+  /**
+   * Converts request body to an instance of provided class. This method should be called only once
+   * per command. This method assumes that incoming request body is of application/json media type.
+   *
+   * @param <T>
+   * @param clazz
+   * @return An instance of clazz.
+   */
   public <T> T json(Class<T> clazz) {
     try {
       byte[] content = getInputStream().readAllBytes();
@@ -43,6 +56,12 @@ public class ApiRequest extends HttpServletRequestWrapper {
     }
   }
 
+  /**
+   * This method is used internally by GAPI to retrieve command which will be executed.
+   *
+   * @param httpServletMapping
+   * @return A portion or request's uri which is matched by the servlet.
+   */
   public static String getMatchedValue(HttpServletMapping httpServletMapping) {
     return switch (httpServletMapping.getMappingMatch()) {
       case EXACT -> ""; // to accept empty mapping, e.g. /test should fire command mapped to ""

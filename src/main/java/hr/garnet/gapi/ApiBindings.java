@@ -7,7 +7,11 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-/** @author vedransmid@gmail.com */
+/**
+ * Bindings for the {@link ServletContext}
+ *
+ * @author vedransmid@gmail.com
+ */
 public class ApiBindings {
 
   private static ServletContext servletContext;
@@ -35,14 +39,26 @@ public class ApiBindings {
         (ApiExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER));
   }
 
+  /**
+   * @param <T>
+   * @param key
+   * @return Attribute value found in the {@link ServletContext} for the given key
+   */
   public static <T> T lookup(String key) {
     return (T) servletContext.getAttribute(key);
   }
 
+  /**
+   * @param name
+   * @return {@link ServletContext} initial parameter for the given name.
+   */
   public static String getInitParameter(String name) {
     return servletContext.getInitParameter(name);
   }
 
+  /**
+   * @return {@link ServletContext} initial parameter names.
+   */
   public static Enumeration<String> getInitParameterNames() {
     return servletContext.getInitParameterNames();
   }

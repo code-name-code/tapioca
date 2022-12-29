@@ -22,6 +22,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
+ * This is where it all starts for GAPI. Extend this class to start configuring your API. In
+ * essence, this is just a {@link ServletContextListener} so you can register it just by using
+ * {@link WebListener} annotation or you can add it programmatic (see tests).
+ *
  * @author vedransmid@gmail.com
  */
 public abstract class Api implements ServletContextListener {
