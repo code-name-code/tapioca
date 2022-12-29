@@ -1,14 +1,23 @@
 package hr.garnet.gapi;
 
-import jakarta.servlet.*;
-import java.util.*;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletRegistration;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * @author vedransmid@gmail.com
- */
+/** @author vedransmid@gmail.com */
 public abstract class Api implements ServletContextListener {
 
   private final List<ApiServletConfigurer> servlets = new ArrayList<>();
@@ -83,9 +92,8 @@ public abstract class Api implements ServletContextListener {
     filters.forEach(
         (filter, mapping) -> {
           FilterRegistration.Dynamic registration;
-          registration = sc.addFilter(filter.getClass().getSimpleName(), filter);
+          registration = sc.addFilter(filter.toString(), filter);
           registration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, mapping);
-
           // TODO Implement remaining programmatic options
         });
   }
@@ -93,11 +101,9 @@ public abstract class Api implements ServletContextListener {
   private void addServlets(ServletContext sc) {
     servlets.forEach(
         apiConfigurer -> {
-          String servletName =
-              apiConfigurer.getClass().getSimpleName() + servlets.indexOf(apiConfigurer);
-
           ServletRegistration.Dynamic registration;
-          registration = sc.addServlet(servletName, new ApiServlet(apiConfigurer));
+          ApiServlet apiServlet = new ApiServlet(apiConfigurer);
+          registration = sc.addServlet(apiServlet.toString(), apiServlet);
           registration.addMapping(apiConfigurer.getUrlPatterns());
           registration.setAsyncSupported(apiConfigurer.isAsyncSupported());
 
