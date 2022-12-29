@@ -85,6 +85,8 @@ public abstract class Api implements ServletContextListener {
           FilterRegistration.Dynamic registration;
           registration = sc.addFilter(filter.getClass().getSimpleName(), filter);
           registration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, mapping);
+
+          // TODO Implement remaining programmatic options
         });
   }
 
@@ -102,6 +104,8 @@ public abstract class Api implements ServletContextListener {
           if (apiConfigurer.getMultipartConfig() != null) {
             registration.setMultipartConfig(apiConfigurer.getMultipartConfig());
           }
+
+          // TODO Implement remaining programmatic options (e.g. security)
         });
   }
 }
