@@ -10,9 +10,10 @@ import jakarta.servlet.ServletRegistration;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -21,13 +22,16 @@ import java.util.function.Function;
 public abstract class Api implements ServletContextListener {
 
   private final List<ApiServletConfigurer> servlets = new ArrayList<>();
-  private final Map<Filter, String[]> filters = new LinkedHashMap<>();
+  private final Set<ApiFilterDef> filters = new LinkedHashSet<>();
 
   private Function<Class<? extends ApiCommand>, ApiCommand> commandProvider;
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
   private ApiExceptionHandler exceptionHandler;
   private final Map<String, Object> contextObjects = new HashMap<>();
+  private final Map<String, String> initParameters = new HashMap<>();
+
+  protected abstract void configure();
 
   protected void setCommandProvider(
       Function<Class<? extends ApiCommand>, ApiCommand> commandProvider) {
@@ -50,11 +54,29 @@ public abstract class Api implements ServletContextListener {
     contextObjects.putIfAbsent(key, o);
   }
 
-  protected void filter(Filter filter, String... urlPatterns) {
-    filters.put(filter, urlPatterns);
+  protected void setInitParameter(String name, String value) {
+    initParameters.putIfAbsent(name, value);
   }
 
-  protected abstract void configure();
+  protected void filter(Filter filter, String... urlPatterns) {
+    filter(filter, false, Map.of(), urlPatterns);
+  }
+
+  protected void filter(Filter filter, boolean isAsyncSupported, String... urlPatterns) {
+    filter(filter, isAsyncSupported, Map.of(), urlPatterns);
+  }
+
+  protected void filter(Filter filter, Map<String, String> initParameters, String... urlPatterns) {
+    filter(filter, false, initParameters, urlPatterns);
+  }
+
+  protected void filter(
+      Filter filter,
+      boolean isAsyncSupported,
+      Map<String, String> initParameters,
+      String... urlPatterns) {
+    filters.add(new ApiFilterDef(filter, isAsyncSupported, initParameters, urlPatterns));
+  }
 
   protected void serve(ApiServletConfigurer apiConfigurer, String... urlPatterns) {
     apiConfigurer.setUrlPatterns(urlPatterns);
@@ -85,16 +107,19 @@ public abstract class Api implements ServletContextListener {
     sc.setAttribute(ApiBindings.SC_COMMAND_PROVIDER, commandProvider);
     sc.setAttribute(ApiBindings.SC_EXCEPTION_HANDLER, exceptionHandler);
 
+    initParameters.forEach(sc::setInitParameter);
     contextObjects.forEach(sc::setAttribute);
   }
 
   private void addFilters(ServletContext sc) {
     filters.forEach(
-        (filter, mapping) -> {
+        (filterDef) -> {
           FilterRegistration.Dynamic registration;
-          registration = sc.addFilter(filter.toString(), filter);
-          registration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, mapping);
-          // TODO Implement remaining programmatic options
+          registration = sc.addFilter(filterDef.filter().toString(), filterDef.filter());
+          registration.addMappingForUrlPatterns(
+              EnumSet.of(DispatcherType.REQUEST), true, filterDef.urlPatterns());
+          registration.setAsyncSupported(filterDef.asyncSupported());
+          filterDef.initParameters().forEach(registration::setInitParameter);
         });
   }
 
@@ -110,6 +135,8 @@ public abstract class Api implements ServletContextListener {
           if (apiConfigurer.getMultipartConfig() != null) {
             registration.setMultipartConfig(apiConfigurer.getMultipartConfig());
           }
+
+          apiConfigurer.getInitParameters().forEach(registration::setInitParameter);
 
           // TODO Implement remaining programmatic options (e.g. security)
         });

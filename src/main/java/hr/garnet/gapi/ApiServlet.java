@@ -6,9 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author vedransmid@gmail.com
- */
+/** @author vedransmid@gmail.com */
 public class ApiServlet extends HttpServlet {
 
   private final ApiServletConfigurer apiConfigurer;
@@ -51,6 +49,7 @@ public class ApiServlet extends HttpServlet {
           } else {
             command = ApiBindings.getCommandProvider().apply(apiCommandHolder.getCommandClass());
           }
+          command.setServletConfig(getServletConfig());
           command.execute(apiReq, apiResp);
           if (!resp.isCommitted()) {
             resp.flushBuffer();

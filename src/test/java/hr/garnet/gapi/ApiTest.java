@@ -29,6 +29,7 @@ public class ApiTest {
   }
 
   public static class ThrowEx implements ApiCommand {
+
     @Override
     public void execute(ApiRequest req, ApiResponse resp) {
       throw new IllegalArgumentException("Illegal argument");
@@ -154,9 +155,9 @@ public class ApiTest {
       bind("key", "ok");
 
       filter(
-          (servletRequest, servletResponse, filterChain) -> {
-            ((HttpServletResponse) servletResponse).setHeader("X-Served-By", "GAPI");
-            filterChain.doFilter(servletRequest, servletResponse);
+          (request, response, chain) -> {
+            ((HttpServletResponse) response).setHeader("X-Served-By", "GAPI");
+            chain.doFilter(request, response);
           },
           "/*");
 
@@ -165,7 +166,7 @@ public class ApiTest {
             api.get(
                 "contextObject",
                 (req, resp) ->
-                    resp.send(200, "text/plain", ApiBindings.<String>get("key").getBytes()));
+                    resp.send(200, "text/plain", ApiBindings.<String>lookup("key").getBytes()));
             api.get(
                 "inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
             api.get("throwex", ThrowEx.class);

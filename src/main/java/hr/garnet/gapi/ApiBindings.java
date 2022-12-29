@@ -1,14 +1,13 @@
 package hr.garnet.gapi;
 
 import jakarta.servlet.ServletContext;
+import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-/**
- * @author vsmid
- */
+/** @author vedransmid@gmail.com */
 public class ApiBindings {
 
   private static ServletContext servletContext;
@@ -36,8 +35,16 @@ public class ApiBindings {
         (ApiExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER));
   }
 
-  public static <T> T get(String key) {
+  public static <T> T lookup(String key) {
     return (T) servletContext.getAttribute(key);
+  }
+
+  public static String getInitParameter(String name) {
+    return servletContext.getInitParameter(name);
+  }
+
+  public static Enumeration<String> getInitParameterNames() {
+    return servletContext.getInitParameterNames();
   }
 
   /**

@@ -1,12 +1,11 @@
 package hr.garnet.gapi;
 
 import jakarta.servlet.MultipartConfigElement;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author vedransmid@gmail.com
- */
+/** @author vedransmid@gmail.com */
 public class ApiServletConfigurer {
 
   private final Map<String, ApiCommandHolder> postMapping = new ConcurrentHashMap<>();
@@ -20,6 +19,7 @@ public class ApiServletConfigurer {
   private String[] urlPatterns;
   private boolean asyncSupported;
   private MultipartConfigElement multipartConfig;
+  private Map<String, String> initParameters = new HashMap<>();
 
   public void get(String path, Class<? extends ApiCommand> command) {
     getMapping.put(stripSlashes(path), new ApiCommandHolder(command));
@@ -133,6 +133,14 @@ public class ApiServletConfigurer {
       String location, long maxFileSize, long maxRequestSize, int fileSizeThreshold) {
     this.multipartConfig =
         new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold);
+  }
+
+  public void setInitParameter(String name, String value) {
+    initParameters.put(name, value);
+  }
+
+  public Map<String, String> getInitParameters() {
+    return initParameters;
   }
 
   private String stripSlashes(String path) {
