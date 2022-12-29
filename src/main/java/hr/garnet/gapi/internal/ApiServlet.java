@@ -2,6 +2,7 @@ package hr.garnet.gapi.internal;
 
 import hr.garnet.gapi.ApiBindings;
 import hr.garnet.gapi.ApiCommand;
+import hr.garnet.gapi.ApiException;
 import hr.garnet.gapi.ApiRequest;
 import hr.garnet.gapi.ApiResponse;
 import jakarta.servlet.http.HttpServlet;
@@ -9,8 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiServlet extends HttpServlet {
 
   private final ApiServletConfigurer apiConfigurer;
@@ -60,12 +64,27 @@ public class ApiServlet extends HttpServlet {
           }
         } catch (Exception e) {
           ApiBindings.getExceptionHandler()
-              .ifPresent(
+              .ifPresentOrElse(
                   eh -> {
                     eh.handleException(e, apiReq, apiResp);
                     try {
                       if (!resp.isCommitted()) {
                         resp.flushBuffer();
+                      }
+                    } catch (IOException ignored) {
+
+                    }
+                  },
+                  () -> {
+                    try {
+                      if (!resp.isCommitted()) {
+                        if (e instanceof ApiException apiException) {
+                          resp.setStatus(apiException.getStatus());
+                          if (Objects.nonNull(apiException.getMessage())) {
+                            resp.getWriter().append(apiException.getMessage());
+                          }
+                          resp.flushBuffer();
+                        }
                       }
                     } catch (IOException ignored) {
 
