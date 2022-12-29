@@ -1,5 +1,7 @@
 package hr.garnet.gapi;
 
+import hr.garnet.gapi.ApiBindings;
+import hr.garnet.gapi.ApiException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;

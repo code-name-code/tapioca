@@ -1,4 +1,4 @@
-package hr.garnet.gapi;
+package hr.garnet.gapi.internal;
 
 import jakarta.servlet.Filter;
 import java.util.Map;

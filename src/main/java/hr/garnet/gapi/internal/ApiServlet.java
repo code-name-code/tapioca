@@ -1,5 +1,9 @@
-package hr.garnet.gapi;
+package hr.garnet.gapi.internal;
 
+import hr.garnet.gapi.ApiBindings;
+import hr.garnet.gapi.ApiCommand;
+import hr.garnet.gapi.ApiRequest;
+import hr.garnet.gapi.ApiResponse;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,7 @@
-package hr.garnet.gapi;
+package hr.garnet.gapi.internal;
 
+import hr.garnet.gapi.ApiCommand;
+import hr.garnet.gapi.internal.ApiCommandHolder;
 import jakarta.servlet.MultipartConfigElement;
 import java.util.HashMap;
 import java.util.Map;

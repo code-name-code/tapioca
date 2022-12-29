@@ -2,6 +2,8 @@ package hr.garnet.gapi;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
+import hr.garnet.gapi.ApiBindings;
+import hr.garnet.gapi.ApiException;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;

@@ -1,5 +1,6 @@
-package hr.garnet.gapi;
+package hr.garnet.gapi.internal;
 
+import hr.garnet.gapi.ApiCommand;
 import java.util.Objects;
 
 /**

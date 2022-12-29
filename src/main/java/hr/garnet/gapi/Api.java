@@ -1,5 +1,8 @@
 package hr.garnet.gapi;
 
+import hr.garnet.gapi.internal.ApiFilterDef;
+import hr.garnet.gapi.internal.ApiServlet;
+import hr.garnet.gapi.internal.ApiServletConfigurer;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
