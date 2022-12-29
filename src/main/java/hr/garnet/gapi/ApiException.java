@@ -1,5 +1,8 @@
 package hr.garnet.gapi;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiException extends RuntimeException {
 
   private final int status;

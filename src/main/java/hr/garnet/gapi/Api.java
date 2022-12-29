@@ -6,6 +6,9 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public abstract class Api implements ServletContextListener {
 
   private final List<ApiServletConfigurer> servlets = new ArrayList<>();
@@ -15,7 +18,7 @@ public abstract class Api implements ServletContextListener {
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
   private ApiExceptionHandler exceptionHandler;
-  private Map<String, Object> contextObjects = new HashMap<>();
+  private final Map<String, Object> contextObjects = new HashMap<>();
 
   protected void setCommandProvider(
       Function<Class<? extends ApiCommand>, ApiCommand> commandProvider) {

@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiResponse extends HttpServletResponseWrapper {
 
   public ApiResponse(HttpServletResponse response) {

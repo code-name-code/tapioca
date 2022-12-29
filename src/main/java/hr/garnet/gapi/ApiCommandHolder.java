@@ -2,6 +2,9 @@ package hr.garnet.gapi;
 
 import java.util.Objects;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiCommandHolder {
   private Class<? extends ApiCommand> commandClass;
   private ApiCommand commandImpl;

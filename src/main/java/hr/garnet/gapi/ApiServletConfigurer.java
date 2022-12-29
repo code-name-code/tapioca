@@ -4,6 +4,9 @@ import jakarta.servlet.MultipartConfigElement;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiServletConfigurer {
 
   private final Map<String, ApiCommandHolder> postMapping = new ConcurrentHashMap<>();

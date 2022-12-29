@@ -10,6 +10,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiRequest extends HttpServletRequestWrapper {
 
   private final Matcher pathMatcher;

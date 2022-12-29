@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiServlet extends HttpServlet {
 
   private final ApiServletConfigurer apiConfigurer;

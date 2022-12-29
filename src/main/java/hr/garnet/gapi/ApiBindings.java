@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
+ * @author vsmid
  * @noinspection unchecked
  */
 public class ApiBindings {
