@@ -1,12 +1,12 @@
 package hr.garnet.gapi;
 
-import static jakarta.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import jakarta.servlet.http.HttpServletResponse;
+import hr.garnet.gapi.cars.Car;
+import hr.garnet.gapi.cars.CarApi;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,182 +14,22 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApiTest {
 
-  public static class Car {
-    public String brand;
-  }
-
-  public static class ThrowEx implements ApiCommand {
-
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      throw new IllegalArgumentException("Illegal argument");
-    }
-  }
-
-  public static class GetAllCars implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.json(200, cars);
-    }
-  }
-
-  public static class GetCarByBrand implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      Optional<String> brandParam = req.getPathParam("brand");
-      if (brandParam.isPresent()) {
-        cars.stream()
-            .filter(car -> car.brand.equalsIgnoreCase(brandParam.get()))
-            .findFirst()
-            .ifPresentOrElse(car -> resp.json(200, car), () -> resp.setStatus(SC_NOT_FOUND));
-      } else {
-        resp.setStatus(SC_NOT_FOUND);
-      }
-    }
-  }
-
-  public static class CreateCar implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      Car car = req.json(Car.class);
-      cars.add(car);
-      resp.send(201, "text/plain", "Created new %s".formatted(car.brand).getBytes());
-    }
-  }
-
-  public static class DeleteCarByBrand implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.setStatus(SC_NO_CONTENT);
-    }
-  }
-
-  public static class UpdateCar implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.setStatus(SC_NO_CONTENT);
-    }
-  }
-
-  public static class Options implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.setHeader("X-Method", "Options");
-    }
-  }
-
-  public static class Head implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.setHeader("X-Method", "Head");
-    }
-  }
-
-  public static class Trace implements ApiCommand {
-    @Override
-    public void execute(ApiRequest req, ApiResponse resp) {
-      resp.setHeader("X-Method", "Trace");
-    }
-  }
-
-  public static class CarApi extends Api {
-    @Override
-    protected void configure() {
-      setCommandProvider(
-          aClass -> {
-            try {
-              return aClass.getDeclaredConstructor().newInstance();
-            } catch (InstantiationException
-                | IllegalAccessException
-                | NoSuchMethodException
-                | InvocationTargetException e) {
-              return null;
-            }
-          });
-
-      setJsonReader(
-          (s, aClass) -> {
-            Car car = new Car();
-            Matcher matcher = Pattern.compile("\\{\"brand\":\"(?<brand>\\w+)\"}").matcher(s);
-            boolean found = matcher.find();
-            if (found) {
-              car.brand = matcher.group("brand");
-            }
-            return car;
-          });
-
-      setJsonWriter(
-          o -> {
-            if (o instanceof List carList) {
-              if (carList.isEmpty()) {
-                return "[]";
-              } else {
-                Car car = (Car) carList.get(0);
-                return "[{\"brand\":\"%s\"}]".formatted(car.brand);
-              }
-            } else {
-              return "[{\"brand\":\"%s\"}]".formatted(((Car) o).brand);
-            }
-          });
-
-      setExceptionHandler(
-          (e, req, resp) -> {
-            try {
-              resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-              resp.getWriter().write(e.getMessage());
-            } catch (IOException ignored) {
-
-            }
-          });
-
-      bind("key", "ok");
-
-      filter(
-          (request, response, chain) -> {
-            ((HttpServletResponse) response).setHeader("X-Served-By", "GAPI");
-            chain.doFilter(request, response);
-          },
-          "/*");
-
-      serve(
-          api -> {
-            api.get(
-                "contextObject",
-                (req, resp) ->
-                    resp.send(200, "text/plain", ApiBindings.<String>lookup("key").getBytes()));
-            api.get(
-                "inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
-            api.get("throwex", ThrowEx.class);
-          },
-          "/exts/*");
-
-      serve(
-          api -> {
-            api.get("", GetAllCars.class);
-            api.get("(?<brand>\\w+)", GetCarByBrand.class);
-            api.post("", CreateCar.class);
-            api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
-            api.put("", UpdateCar.class);
-            api.head("", Head.class);
-          },
-          "/cars/*");
-    }
-  }
-
   static Tomcat tomcat;
   static final int port = 11112;
   static final URI uri = URI.create("http://localhost:%d/".formatted(port));
-  static final List<Car> cars = new ArrayList<>(1);
+  public static final List<Car> CARS = new ArrayList<>(1);
 
   @BeforeAll
   public static void setup() throws Exception {
