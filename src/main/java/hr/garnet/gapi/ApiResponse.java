@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Wrapper around {@link HttpServletResponse} which provides some additional, convenient methods,
- * out of the box.
+ * Wrapper around {@link HttpServletResponse} which provides some additional, convenient methods out
+ * of the box. Used by {@link ApiCommand}.
  *
  * @author vedransmid@gmail.com
  */
@@ -18,10 +18,10 @@ public class ApiResponse extends HttpServletResponseWrapper {
   }
 
   /**
-   * Convenient method for sending response in one line.
+   * Send response in one line
    *
-   * @param status Sets response status
-   * @param contentType Sets response content type
+   * @param status Response status
+   * @param contentType Response content type
    * @param data Data to be written to the response output stream
    */
   public void send(int status, String contentType, byte[] data) {
@@ -37,10 +37,11 @@ public class ApiResponse extends HttpServletResponseWrapper {
   }
 
   /**
-   * Convenient method for sending json based responses.
+   * Send json response in one line
    *
-   * @param status Sets response status
-   * @param data Data to be written to the response output stream
+   * @param status Response status
+   * @param data Data to be written to the response output stream. This data should be JSON
+   *     compatible.
    */
   public void json(int status, Object data) {
     send(status, "application/json", json(data).getBytes(StandardCharsets.UTF_8));

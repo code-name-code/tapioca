@@ -12,12 +12,18 @@ import java.util.regex.Pattern;
 
 /**
  * Wrapper around {@link HttpServletRequest} which provides some additional, convenient methods out
- * of the box.
+ * of the box. Used by {@link ApiCommand}.
  *
  * @author vedransmid@gmail.com
  */
 public class ApiRequest extends HttpServletRequestWrapper {
 
+  /**
+   * Matcher used to extract path parameters. It assumes that mapping for the command uses regular
+   * expressions with named groups.
+   *
+   * <p>e.g. <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b>
+   */
   private final Matcher pathMatcher;
 
   public ApiRequest(HttpServletRequest request, String mapping) {
@@ -27,8 +33,14 @@ public class ApiRequest extends HttpServletRequestWrapper {
   }
 
   /**
-   * @param name Path parameter name.
-   * @return Path parameter value for the provided path parameter name.
+   * s e.g.
+   *
+   * <p>For mapping: <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b> and incoming
+   * request: <b>http://localhost:8080/resources/cars/porsche</b> method call <code>
+   * getPathParam("name")</code> will return "porsche" wrapped in an {@link Optional}.
+   *
+   * @param name Path parameter name
+   * @return Path parameter value for the provided path parameter name
    */
   public Optional<String> getPathParam(String name) {
     try {
@@ -40,13 +52,17 @@ public class ApiRequest extends HttpServletRequestWrapper {
   }
 
   /**
-   * Converts request body to an instance of provided class. This method should be called only once
-   * per command. This method assumes that incoming request body is of application/json media type.
+   * Converts incoming request body into an instance of provided class. This method should be called
+   * only once per command otherwise exception will be thrown (stream can be read only once). This
+   * method assumes that incoming request body is of <b>application/json</b> media type. If
+   * conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status is
+   * thrown.
    *
    * @param <T>
-   * @param clazz
-   * @return An instance of clazz.
+   * @param clazz Targeted object instance class
+   * @return An instance of parameter clazz
    */
+  @SuppressWarnings("unchecked")
   public <T> T json(Class<T> clazz) {
     try {
       byte[] content = getInputStream().readAllBytes();
@@ -57,10 +73,13 @@ public class ApiRequest extends HttpServletRequestWrapper {
   }
 
   /**
-   * This method is used internally by GAPI to retrieve command which will be executed.
+   * This method is used internally by GAPI to retrieve command which will be executed by the {@link
+   * hr.garnet.gapi.internal.ApiServlet}.
    *
-   * @param httpServletMapping
-   * @return A portion or request's uri which is matched by the servlet.
+   * @param httpServletMapping {@link HttpServletMapping}
+   * @return A part or request's URI which is matched by the servlet. This URI part is then matched
+   *     against each key in the {@link java.util.HashMap} containing command mappings. For more
+   *     details on how matching is done, see {@link hr.garnet.gapi.internal.ApiServlet}.
    */
   public static String getMatchedValue(HttpServletMapping httpServletMapping) {
     return switch (httpServletMapping.getMappingMatch()) {
