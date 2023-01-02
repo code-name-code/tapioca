@@ -2,6 +2,7 @@ package hr.garnet.gapi;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
+import hr.garnet.gapi.internal.Processor;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -12,21 +13,21 @@ import java.util.regex.Pattern;
 
 /**
  * Wrapper around {@link HttpServletRequest} which provides some additional, convenient methods out
- * of the box. Used by {@link ApiCommand}.
+ * of the box. Used by {@link WebMethod}.
  *
  * @author vedransmid@gmail.com
  */
-public class ApiRequest extends HttpServletRequestWrapper {
+public class Request extends HttpServletRequestWrapper {
 
   /**
-   * Matcher used to extract path parameters. It assumes that mapping for the command uses regular
-   * expressions with named groups.
+   * Matcher used to extract path parameters. It assumes that mapping for the web method uses
+   * regular expressions with named groups.
    *
    * <p>e.g. <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b>
    */
   private final Matcher pathMatcher;
 
-  public ApiRequest(HttpServletRequest request, String mapping) {
+  public Request(HttpServletRequest request, String mapping) {
     super(request);
     String matchedValue = getMatchedValue(request.getHttpServletMapping());
     this.pathMatcher = Pattern.compile(mapping).matcher(matchedValue);
@@ -53,8 +54,8 @@ public class ApiRequest extends HttpServletRequestWrapper {
 
   /**
    * Converts incoming request body into an instance of provided class. This method should be called
-   * only once per command otherwise exception will be thrown (stream can be read only once). This
-   * method assumes that incoming request body is of <b>application/json</b> media type. If
+   * only once per web method otherwise exception will be thrown (stream can be read only once).
+   * This method assumes that incoming request body is of <b>application/json</b> media type. If
    * conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status is
    * thrown.
    *
@@ -66,24 +67,24 @@ public class ApiRequest extends HttpServletRequestWrapper {
   public <T> T json(Class<T> clazz) {
     try {
       byte[] content = getInputStream().readAllBytes();
-      return (T) ApiBindings.getJsonReader().apply(new String(content), clazz);
+      return (T) Bindings.getJsonReader().apply(new String(content), clazz);
     } catch (IOException e) {
       throw new ApiException(SC_BAD_REQUEST);
     }
   }
 
   /**
-   * This method is used internally by GAPI to retrieve command which will be executed by the {@link
-   * hr.garnet.gapi.internal.ApiServlet}.
+   * This method is used internally by GAPI to retrieve web method which will be executed by the
+   * {@link Processor}.
    *
    * @param httpServletMapping {@link HttpServletMapping}
    * @return A part or request's URI which is matched by the servlet. This URI part is then matched
-   *     against each key in the {@link java.util.HashMap} containing command mappings. For more
-   *     details on how matching is done, see {@link hr.garnet.gapi.internal.ApiServlet}.
+   *     against each key in the {@link java.util.HashMap} containing web method mappings. For more
+   *     details on how matching is done, see {@link Processor}.
    */
   public static String getMatchedValue(HttpServletMapping httpServletMapping) {
     return switch (httpServletMapping.getMappingMatch()) {
-      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire command mapped to ""
+      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire web method mapped to ""
       case PATH -> httpServletMapping.getMatchValue();
       default -> null;
     };

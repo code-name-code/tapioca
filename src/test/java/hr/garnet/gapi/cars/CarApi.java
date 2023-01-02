@@ -1,14 +1,14 @@
 package hr.garnet.gapi.cars;
 
 import hr.garnet.gapi.Api;
-import hr.garnet.gapi.ApiBindings;
-import hr.garnet.gapi.cars.command.CreateCar;
-import hr.garnet.gapi.cars.command.DeleteCarByBrand;
-import hr.garnet.gapi.cars.command.GetAllCars;
-import hr.garnet.gapi.cars.command.GetCarByBrand;
-import hr.garnet.gapi.cars.command.Head;
-import hr.garnet.gapi.cars.command.ThrowEx;
-import hr.garnet.gapi.cars.command.UpdateCar;
+import hr.garnet.gapi.Bindings;
+import hr.garnet.gapi.cars.webmethod.CreateCar;
+import hr.garnet.gapi.cars.webmethod.DeleteCarByBrand;
+import hr.garnet.gapi.cars.webmethod.GetAllCars;
+import hr.garnet.gapi.cars.webmethod.GetCarByBrand;
+import hr.garnet.gapi.cars.webmethod.Head;
+import hr.garnet.gapi.cars.webmethod.ThrowEx;
+import hr.garnet.gapi.cars.webmethod.UpdateCar;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +21,7 @@ public class CarApi extends Api {
 
   @Override
   protected void configure() {
-    setCommandProvider(
+    setWebMethodProvider(
         aClass -> {
           try {
             return aClass.getDeclaredConstructor().newInstance();
@@ -60,7 +60,7 @@ public class CarApi extends Api {
           api.get(
               "contextObject",
               (req, resp) ->
-                  resp.send(200, "text/plain", ApiBindings.<String>lookup("key").getBytes()));
+                  resp.send(200, "text/plain", Bindings.<String>lookup("key").getBytes()));
           api.get(
               "inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
           api.get("throwex", ThrowEx.class);

@@ -1,5 +1,6 @@
 package hr.garnet.gapi;
 
+import hr.garnet.gapi.internal.Processor;
 import jakarta.servlet.ServletContext;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,13 +13,13 @@ import java.util.function.Function;
  *
  * @author vedransmid@gmail.com
  */
-public class ApiBindings {
+public class Bindings {
 
   private static ServletContext servletContext;
 
   public static final String SC_JSON_READER = "hr.garnet.gapi.json.reader";
   public static final String SC_JSON_WRITER = "hr.garnet.gapi.json.writer";
-  public static final String SC_COMMAND_PROVIDER = "hr.garnet.gapi.command.provider";
+  public static final String SC_WEB_METHOD_PROVIDER = "hr.garnet.gapi.webmethod.provider";
   public static final String SC_EXCEPTION_HANDLER = "hr.garnet.gapi.exception.handler";
 
   /**
@@ -44,26 +45,26 @@ public class ApiBindings {
   }
 
   /**
-   * Dedicated attribute used internally by GAPI as a {@link ApiCommand} provider.
+   * Dedicated attribute used internally by GAPI as a {@link WebMethod} provider.
    *
-   * @return {@link Function} which provisions @{link {@link ApiCommand}} to be executed by {@link
-   *     hr.garnet.gapi.internal.ApiServlet}.
+   * @return {@link Function} which provisions @{link {@link WebMethod}} to be executed by {@link
+   *     Processor}.
    */
   @SuppressWarnings("unchecked")
-  public static Function<Class<? extends ApiCommand>, ApiCommand> getCommandProvider() {
-    return (Function<Class<? extends ApiCommand>, ApiCommand>)
-        servletContext.getAttribute(SC_COMMAND_PROVIDER);
+  public static Function<Class<? extends WebMethod>, WebMethod> getCommandProvider() {
+    return (Function<Class<? extends WebMethod>, WebMethod>)
+        servletContext.getAttribute(SC_WEB_METHOD_PROVIDER);
   }
 
   /**
    * Dedicated attribute used internally by GAPI to handle exceptions thrown during {@link
-   * hr.garnet.gapi.internal.ApiServlet} execution.
+   * Processor} execution.
    *
-   * @return {@link ApiExceptionHandler} wrapped in {@link Optional}
+   * @return {@link ExceptionHandler} wrapped in {@link Optional}
    */
-  public static Optional<ApiExceptionHandler> getExceptionHandler() {
+  public static Optional<ExceptionHandler> getExceptionHandler() {
     return Optional.ofNullable(
-        (ApiExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER));
+        (ExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER));
   }
 
   /**

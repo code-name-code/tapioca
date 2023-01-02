@@ -7,13 +7,13 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper around {@link HttpServletResponse} which provides some additional, convenient methods out
- * of the box. Used by {@link ApiCommand}.
+ * of the box. Used by {@link WebMethod}.
  *
  * @author vedransmid@gmail.com
  */
-public class ApiResponse extends HttpServletResponseWrapper {
+public class Response extends HttpServletResponseWrapper {
 
-  public ApiResponse(HttpServletResponse response) {
+  public Response(HttpServletResponse response) {
     super(response);
   }
 
@@ -48,6 +48,6 @@ public class ApiResponse extends HttpServletResponseWrapper {
   }
 
   private String json(Object data) {
-    return ApiBindings.getJsonWriter().apply(data);
+    return Bindings.getJsonWriter().apply(data);
   }
 }

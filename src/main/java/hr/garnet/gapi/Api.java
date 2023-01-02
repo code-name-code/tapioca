@@ -1,8 +1,8 @@
 package hr.garnet.gapi;
 
-import hr.garnet.gapi.internal.ApiFilterDef;
-import hr.garnet.gapi.internal.ApiServlet;
-import hr.garnet.gapi.internal.ApiServletConfigurer;
+import hr.garnet.gapi.internal.FilterDef;
+import hr.garnet.gapi.internal.Processor;
+import hr.garnet.gapi.internal.ServletConfigurer;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
@@ -22,13 +22,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Extend this class to start configuring/implementing your API. In essence, this is just a {@link
- * ServletContextListener} with some sugar on top to make implementing {@link
- * jakarta.servlet.http.HttpServlet} fun and easy. It hides a lot of boilerplate from the developer,
- * and also adds a few powerful features such as mapping using regular expressions. It feels like
- * JAX-RS, but it is a lot simpler and thinner. GAPI depends only on Jakarta Servlet specification,
- * but you can use any other Jakarta EE specification just like you would used it normally when
- * developing Jakarta EE applications/services.
+ * Extend this class to start configuring/implementing your API. In essence, this is just a
+ * {@link ServletContextListener} with some sugar on top to make implementing
+ * {@link jakarta.servlet.http.HttpServlet} fun and easy. It hides a lot of boilerplate from the
+ * developer, and also adds a few powerful features such as mapping using regular expressions. It
+ * feels like JAX-RS, but it is a lot simpler and thinner. GAPI depends only on Jakarta Servlet
+ * specification, but you can use any other Jakarta EE specification just like you would used it
+ * normally when developing Jakarta EE applications/services.
  *
  * <p>You can register it just by using {@link jakarta.servlet.annotation.WebListener} annotation,
  * or you can add it programmatic (see tests).
@@ -41,16 +41,16 @@ import java.util.function.Function;
  *   protected void configure() {
  *
  *     // Classic way of creating class instance on the fly - no dependency injection
- *     setCommandProvider(commandClass -> {
+ *     setWebMethodProvider(webMethodClass -> {
  *       try {
- *         return commandClass.getDeclaredConstructor().newInstance();
+ *         return webMethodClass.getDeclaredConstructor().newInstance();
  *       } catch (Exception e) {
  *         // handle exceptions
  *       }
  *     });
  *
  *     // CDI way of crating class instances on the fly (you could also use Guice, HK2 etc.)
- *     setCommandProvider(commandClass -> command -> CDI.current().select(commandClass).get());
+ *     setWebMethodProvider(webMethodClass -> CDI.current().select(webMethodClass).get());
  *   }
  * }
  * </code>
@@ -59,15 +59,15 @@ import java.util.function.Function;
  */
 public abstract class Api implements ServletContextListener {
 
-  private final List<ApiServletConfigurer> servlets;
-  private final Set<ApiFilterDef> filters;
+  private final List<ServletConfigurer> servlets;
+  private final Set<FilterDef> filters;
   private final Map<String, Object> contextObjects;
   private final Map<String, String> initParameters;
 
-  private Function<Class<? extends ApiCommand>, ApiCommand> commandProvider;
+  private Function<Class<? extends WebMethod>, WebMethod> webMethodProvider;
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
-  private ApiExceptionHandler exceptionHandler;
+  private ExceptionHandler exceptionHandler;
 
   public Api() {
     this.contextObjects = new HashMap<>();
@@ -80,14 +80,14 @@ public abstract class Api implements ServletContextListener {
   protected abstract void configure();
 
   /**
-   * Set command provider.
+   * Set web method provider.
    *
-   * @param commandProvider Function which provides command instance to be executed by the {@link
-   *     ApiServlet}
+   * @param webMethodProvider Function which provides web method instance to be executed by the
+   *     {@link Processor}
    */
-  protected void setCommandProvider(
-      Function<Class<? extends ApiCommand>, ApiCommand> commandProvider) {
-    this.commandProvider = commandProvider;
+  protected void setWebMethodProvider(
+      Function<Class<? extends WebMethod>, WebMethod> webMethodProvider) {
+    this.webMethodProvider = webMethodProvider;
   }
 
   /**
@@ -103,7 +103,7 @@ public abstract class Api implements ServletContextListener {
   /**
    * Set JSON writing function.
    *
-   * @param jsonWriter Used internally by the GAPI to write JSON content to the {@link ApiServlet}
+   * @param jsonWriter Used internally by the GAPI to write JSON content to the {@link Processor}
    *     output stream.
    */
   protected void setJsonWriter(Function<Object, String> jsonWriter) {
@@ -113,9 +113,9 @@ public abstract class Api implements ServletContextListener {
   /**
    * Set global exception handler.
    *
-   * @param exceptionHandler {@link ApiExceptionHandler}
+   * @param exceptionHandler {@link ExceptionHandler}
    */
-  protected void setExceptionHandler(ApiExceptionHandler exceptionHandler) {
+  protected void setExceptionHandler(ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
   }
 
@@ -184,40 +184,39 @@ public abstract class Api implements ServletContextListener {
       boolean isAsyncSupported,
       Map<String, String> initParameters,
       String... urlPatterns) {
-    filters.add(new ApiFilterDef(filter, isAsyncSupported, initParameters, urlPatterns));
+    filters.add(new FilterDef(filter, isAsyncSupported, initParameters, urlPatterns));
   }
 
   /**
    * Configure servlet for the configured URL patterns. Underlying servlet implementation used is
-   * {@link ApiServlet}. Each call to this method will create a new instance of {@link
-   * ApiServlet}.Configuring servlet using this method offers same functionalities as {@link
-   * jakarta.servlet.ServletRegistration.Dynamic} through {@link ApiServletConfigurer}.
+   * {@link Processor}. Each call to this method will create a new instance of {@link
+   * Processor}.Configuring servlet using this method offers same functionalities as {@link
+   * jakarta.servlet.ServletRegistration.Dynamic} through {@link ServletConfigurer}.
    *
-   * @param apiConfigurer {@link ApiServletConfigurer}
+   * @param apiConfigurer {@link ServletConfigurer}
    * @param urlPatterns URL patterns this servlet will be serving
    */
   @SuppressWarnings("ClassEscapesDefinedScope")
-  protected void serve(ApiServletConfigurer apiConfigurer, String... urlPatterns) {
+  protected void serve(ServletConfigurer apiConfigurer, String... urlPatterns) {
     apiConfigurer.setUrlPatterns(urlPatterns);
     servlets.add(apiConfigurer);
   }
 
   /**
    * Configure servlet for the configured URL patterns. Underlying servlet implementation used is
-   * {@link ApiServlet}. Each call to this method will create a new instance of {@link ApiServlet}.
+   * {@link Processor}. Each call to this method will create a new instance of {@link Processor}.
    * Configuring servlet using this method offers same functionalities as {@link
-   * jakarta.servlet.ServletRegistration.Dynamic} through {@link ApiServletConfigurer}. This method
-   * offers functional alternative to {@link Api#serve(ApiServletConfigurer, String...)} method
-   * through {@link Consumer}. This way you provide inline servlet configuration without the need
-   * for creating a separate class.
+   * jakarta.servlet.ServletRegistration.Dynamic} through {@link ServletConfigurer}. This method
+   * offers functional alternative to {@link Api#serve(ServletConfigurer, String...)} method through
+   * {@link Consumer}. This way you provide inline servlet configuration without the need for
+   * creating a separate class.
    *
-   * @param apiConfigurerConsumer {@link ApiServletConfigurer} consumer
+   * @param apiConfigurerConsumer {@link ServletConfigurer} consumer
    * @param urlPatterns URL patterns this servlet will be serving
    */
   @SuppressWarnings("ClassEscapesDefinedScope")
-  protected void serve(
-      Consumer<ApiServletConfigurer> apiConfigurerConsumer, String... urlPatterns) {
-    ApiServletConfigurer apiConfigurer = new ApiServletConfigurer();
+  protected void serve(Consumer<ServletConfigurer> apiConfigurerConsumer, String... urlPatterns) {
+    ServletConfigurer apiConfigurer = new ServletConfigurer();
     apiConfigurer.setUrlPatterns(urlPatterns);
     apiConfigurerConsumer.accept(apiConfigurer);
     servlets.add(apiConfigurer);
@@ -231,7 +230,7 @@ public abstract class Api implements ServletContextListener {
    */
   @Override
   public void contextInitialized(ServletContextEvent sce) {
-    ApiBindings.setServletContext(sce.getServletContext());
+    Bindings.setServletContext(sce.getServletContext());
 
     configure();
     setServletContext(sce.getServletContext());
@@ -245,10 +244,10 @@ public abstract class Api implements ServletContextListener {
    * @param sc {@link ServletContext}
    */
   private void setServletContext(ServletContext sc) {
-    sc.setAttribute(ApiBindings.SC_JSON_READER, jsonReader);
-    sc.setAttribute(ApiBindings.SC_JSON_WRITER, jsonWriter);
-    sc.setAttribute(ApiBindings.SC_COMMAND_PROVIDER, commandProvider);
-    sc.setAttribute(ApiBindings.SC_EXCEPTION_HANDLER, exceptionHandler);
+    sc.setAttribute(Bindings.SC_JSON_READER, jsonReader);
+    sc.setAttribute(Bindings.SC_JSON_WRITER, jsonWriter);
+    sc.setAttribute(Bindings.SC_WEB_METHOD_PROVIDER, webMethodProvider);
+    sc.setAttribute(Bindings.SC_EXCEPTION_HANDLER, exceptionHandler);
 
     initParameters.forEach(sc::setInitParameter);
     contextObjects.forEach(sc::setAttribute);
@@ -280,7 +279,7 @@ public abstract class Api implements ServletContextListener {
     servlets.forEach(
         apiConfigurer -> {
           ServletRegistration.Dynamic registration;
-          ApiServlet apiServlet = new ApiServlet(apiConfigurer);
+          Processor apiServlet = new Processor(apiConfigurer);
           registration = sc.addServlet(apiServlet.toString(), apiServlet);
           registration.addMapping(apiConfigurer.getUrlPatterns());
           registration.setAsyncSupported(apiConfigurer.isAsyncSupported());

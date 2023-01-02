@@ -1,17 +1,17 @@
-package hr.garnet.gapi.cars.command;
+package hr.garnet.gapi.cars.webmethod;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
-import hr.garnet.gapi.ApiCommand;
-import hr.garnet.gapi.ApiRequest;
-import hr.garnet.gapi.ApiResponse;
+import hr.garnet.gapi.WebMethod;
+import hr.garnet.gapi.Request;
+import hr.garnet.gapi.Response;
 import hr.garnet.gapi.ApiTest;
 import java.util.Optional;
 
-public class GetCarByBrand implements ApiCommand {
+public class GetCarByBrand implements WebMethod {
 
   @Override
-  public void execute(ApiRequest req, ApiResponse resp) {
+  public void invoke(Request req, Response resp) {
     Optional<String> brandParam = req.getPathParam("brand");
     if (brandParam.isPresent()) {
       ApiTest.CARS.stream()

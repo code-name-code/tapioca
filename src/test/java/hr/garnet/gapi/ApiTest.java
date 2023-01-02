@@ -176,7 +176,7 @@ public class ApiTest {
 
   @Test
   @Order(11)
-  public void should_use_inline_command_implementation() throws IOException, InterruptedException {
+  public void should_use_inline_web_method_implementation() throws IOException, InterruptedException {
     HttpRequest inlineImpl =
         HttpRequest.newBuilder(uri.resolve("exts/").resolve("inlineImpl")).GET().build();
 

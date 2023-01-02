@@ -1,10 +1,10 @@
 package hr.garnet.gapi.internal;
 
-import hr.garnet.gapi.ApiBindings;
-import hr.garnet.gapi.ApiCommand;
 import hr.garnet.gapi.ApiException;
-import hr.garnet.gapi.ApiRequest;
-import hr.garnet.gapi.ApiResponse;
+import hr.garnet.gapi.Bindings;
+import hr.garnet.gapi.Request;
+import hr.garnet.gapi.Response;
+import hr.garnet.gapi.WebMethod;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,20 +12,18 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * @author vedransmid@gmail.com
- */
-public class ApiServlet extends HttpServlet {
+/** @author vedransmid@gmail.com */
+public class Processor extends HttpServlet {
 
-  private final ApiServletConfigurer apiConfigurer;
+  private final ServletConfigurer apiConfigurer;
 
-  public ApiServlet(ApiServletConfigurer apiConfigurer) {
-    this.apiConfigurer = apiConfigurer;
+  public Processor(ServletConfigurer servletConfigurer) {
+    this.apiConfigurer = servletConfigurer;
   }
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
-    Map<String, ApiCommandHolder> commandMappings =
+    Map<String, WebMethodHolder> webMethodMappings =
         switch (req.getMethod()) {
           case "GET" -> apiConfigurer.getGetMapping();
           case "POST" -> apiConfigurer.getPostMapping();
@@ -37,33 +35,33 @@ public class ApiServlet extends HttpServlet {
           default -> null;
         };
 
-    if (commandMappings == null) {
+    if (webMethodMappings == null) {
       resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
       return;
     }
 
-    boolean commandMappingFound = false;
-    for (String mapping : commandMappings.keySet()) {
-      String matchedValue = ApiRequest.getMatchedValue(req.getHttpServletMapping());
+    boolean mappingFound = false;
+    for (String mapping : webMethodMappings.keySet()) {
+      String matchedValue = Request.getMatchedValue(req.getHttpServletMapping());
       if (matchedValue.matches(mapping)) {
-        ApiRequest apiReq = new ApiRequest(req, mapping);
-        ApiResponse apiResp = new ApiResponse(resp);
-        ApiCommandHolder apiCommandHolder = commandMappings.get(mapping);
-        ApiCommand command;
-        commandMappingFound = true;
+        Request apiReq = new Request(req, mapping);
+        Response apiResp = new Response(resp);
+        WebMethodHolder webMethodHolder = webMethodMappings.get(mapping);
+        WebMethod method;
+        mappingFound = true;
         try {
-          if (apiCommandHolder.containsImplementation()) {
-            command = apiCommandHolder.getCommandImpl();
+          if (webMethodHolder.containsImplementation()) {
+            method = webMethodHolder.getWebMethodImpl();
           } else {
-            command = ApiBindings.getCommandProvider().apply(apiCommandHolder.getCommandClass());
+            method = Bindings.getCommandProvider().apply(webMethodHolder.getWebMethodClass());
           }
-          command.setServletConfig(getServletConfig());
-          command.execute(apiReq, apiResp);
+          method.setServletConfig(getServletConfig());
+          method.invoke(apiReq, apiResp);
           if (!resp.isCommitted()) {
             resp.flushBuffer();
           }
         } catch (Exception e) {
-          ApiBindings.getExceptionHandler()
+          Bindings.getExceptionHandler()
               .ifPresentOrElse(
                   eh -> {
                     eh.handleException(e, apiReq, apiResp);
@@ -94,7 +92,7 @@ public class ApiServlet extends HttpServlet {
       }
     }
 
-    if (!commandMappingFound) {
+    if (!mappingFound) {
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
   }
