@@ -98,7 +98,7 @@ public class ApiTest {
         HttpClient.newHttpClient().send(getCarByBrand, HttpResponse.BodyHandlers.ofString());
 
     assertEquals(200, response.statusCode());
-    assertEquals("[{\"brand\":\"Porsche\"}]", response.body());
+    assertEquals("{\"brand\":\"Porsche\"}", response.body());
   }
 
   @Test
