@@ -1,13 +1,14 @@
 package hr.garnet.gapi.internal;
 
 import hr.garnet.gapi.ApiCommand;
-import hr.garnet.gapi.internal.ApiCommandHolder;
 import jakarta.servlet.MultipartConfigElement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ApiServletConfigurer {
 
   private final Map<String, ApiCommandHolder> postMapping = new ConcurrentHashMap<>();
@@ -18,10 +19,11 @@ public class ApiServletConfigurer {
   private final Map<String, ApiCommandHolder> headMapping = new ConcurrentHashMap<>();
   private final Map<String, ApiCommandHolder> optionsMapping = new ConcurrentHashMap<>();
 
+  private final Map<String, String> initParameters = new HashMap<>();
+
   private String[] urlPatterns;
   private boolean asyncSupported;
   private MultipartConfigElement multipartConfig;
-  private Map<String, String> initParameters = new HashMap<>();
 
   public void get(String path, Class<? extends ApiCommand> command) {
     getMapping.put(stripSlashes(path), new ApiCommandHolder(command));
