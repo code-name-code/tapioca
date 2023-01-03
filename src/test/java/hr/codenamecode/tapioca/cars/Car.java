@@ -1,4 +1,4 @@
-package hr.garnet.gapi.cars;
+package hr.codenamecode.tapioca.cars;
 
 public class Car {
 

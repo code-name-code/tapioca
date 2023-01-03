@@ -1,4 +1,4 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;

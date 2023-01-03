@@ -1,6 +1,6 @@
-package hr.garnet.gapi.internal;
+package hr.codenamecode.tapioca.internal;
 
-import hr.garnet.gapi.WebMethod;
+import hr.codenamecode.tapioca.WebMethod;
 import jakarta.servlet.MultipartConfigElement;
 import java.util.HashMap;
 import java.util.Map;

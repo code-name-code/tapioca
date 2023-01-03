@@ -1,14 +1,14 @@
-package hr.garnet.gapi.cars;
+package hr.codenamecode.tapioca.cars;
 
-import hr.garnet.gapi.Api;
-import hr.garnet.gapi.Bindings;
-import hr.garnet.gapi.cars.webmethod.CreateCar;
-import hr.garnet.gapi.cars.webmethod.DeleteCarByBrand;
-import hr.garnet.gapi.cars.webmethod.GetAllCars;
-import hr.garnet.gapi.cars.webmethod.GetCarByBrand;
-import hr.garnet.gapi.cars.webmethod.Head;
-import hr.garnet.gapi.cars.webmethod.ThrowEx;
-import hr.garnet.gapi.cars.webmethod.UpdateCar;
+import hr.codenamecode.tapioca.Api;
+import hr.codenamecode.tapioca.Bindings;
+import hr.codenamecode.tapioca.cars.webmethod.CreateCar;
+import hr.codenamecode.tapioca.cars.webmethod.DeleteCarByBrand;
+import hr.codenamecode.tapioca.cars.webmethod.GetAllCars;
+import hr.codenamecode.tapioca.cars.webmethod.GetCarByBrand;
+import hr.codenamecode.tapioca.cars.webmethod.Head;
+import hr.codenamecode.tapioca.cars.webmethod.ThrowEx;
+import hr.codenamecode.tapioca.cars.webmethod.UpdateCar;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +50,7 @@ public class CarApi extends Api {
 
     filter(
         (request, response, chain) -> {
-          ((HttpServletResponse) response).setHeader("X-Served-By", "GAPI");
+          ((HttpServletResponse) response).setHeader("X-Served-By", "Tapioca");
           chain.doFilter(request, response);
         },
         "/*");

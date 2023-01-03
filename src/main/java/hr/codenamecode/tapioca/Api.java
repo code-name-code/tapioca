@@ -1,8 +1,8 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
-import hr.garnet.gapi.internal.FilterDef;
-import hr.garnet.gapi.internal.Processor;
-import hr.garnet.gapi.internal.ServletConfigurer;
+import hr.codenamecode.tapioca.internal.FilterDef;
+import hr.codenamecode.tapioca.internal.Processor;
+import hr.codenamecode.tapioca.internal.ServletConfigurer;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
@@ -26,7 +26,7 @@ import java.util.function.Function;
  * {@link ServletContextListener} with some sugar on top to make implementing
  * {@link jakarta.servlet.http.HttpServlet} fun and easy. It hides a lot of boilerplate from the
  * developer, and also adds a few powerful features such as mapping using regular expressions. It
- * feels like JAX-RS, but it is a lot simpler and thinner. GAPI depends only on Jakarta Servlet
+ * feels like JAX-RS, but it is a lot simpler and thinner. Tapioca depends only on Jakarta Servlet
  * specification, but you can use any other Jakarta EE specification just like you would used it
  * normally when developing Jakarta EE applications/services.
  *
@@ -35,7 +35,7 @@ import java.util.function.Function;
  *
  * <pre><code>
  * &#64;WebListener
- * public class GarnetApi extends Api {
+ * public class CodenamecodeApi extends Api {
  *
  *   &#64;Override
  *   protected void configure() {
@@ -93,7 +93,7 @@ public abstract class Api implements ServletContextListener {
   /**
    * Set JSON reading function.
    *
-   * @param jsonReader Reader used internally by the GAPI to convert incoming request body
+   * @param jsonReader Reader used internally by the Tapioca to convert incoming request body
    *     containing JSON content into an instance of provided class.
    */
   protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader) {
@@ -103,7 +103,7 @@ public abstract class Api implements ServletContextListener {
   /**
    * Set JSON writing function.
    *
-   * @param jsonWriter Used internally by the GAPI to write JSON content to the {@link Processor}
+   * @param jsonWriter Used internally by the Tapioca to write JSON content to the {@link Processor}
    *     output stream.
    */
   protected void setJsonWriter(Function<Object, String> jsonWriter) {
@@ -223,7 +223,7 @@ public abstract class Api implements ServletContextListener {
   }
 
   /**
-   * This method should only be called by the container and never by the developer. GAPI hooks to
+   * This method should only be called by the container and never by the developer. Tapioca hooks to
    * this method to initialize itself.
    *
    * @param sce {@link ServletContextEvent} containing the ServletContext that is being initialized

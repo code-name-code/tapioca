@@ -1,11 +1,11 @@
-package hr.garnet.gapi.cars.webmethod;
+package hr.codenamecode.tapioca.cars.webmethod;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
-import hr.garnet.gapi.WebMethod;
-import hr.garnet.gapi.Request;
-import hr.garnet.gapi.Response;
-import hr.garnet.gapi.ApiTest;
+import hr.codenamecode.tapioca.Response;
+import hr.codenamecode.tapioca.WebMethod;
+import hr.codenamecode.tapioca.Request;
+import hr.codenamecode.tapioca.ApiTest;
 import java.util.Optional;
 
 public class GetCarByBrand implements WebMethod {

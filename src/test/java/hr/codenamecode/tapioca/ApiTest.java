@@ -1,10 +1,10 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import hr.garnet.gapi.cars.Car;
-import hr.garnet.gapi.cars.CarApi;
+import hr.codenamecode.tapioca.cars.Car;
+import hr.codenamecode.tapioca.cars.CarApi;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -121,7 +121,7 @@ public class ApiTest {
     HttpResponse<String> response =
         HttpClient.newHttpClient().send(getTenants, HttpResponse.BodyHandlers.ofString());
 
-    assertEquals("GAPI", response.headers().map().get("X-Served-By").get(0));
+    assertEquals("Tapioca", response.headers().map().get("X-Served-By").get(0));
   }
 
   @Test

@@ -1,6 +1,6 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
-import hr.garnet.gapi.internal.Processor;
+import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.ServletContext;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,13 +17,13 @@ public class Bindings {
 
   private static ServletContext servletContext;
 
-  public static final String SC_JSON_READER = "hr.garnet.gapi.json.reader";
-  public static final String SC_JSON_WRITER = "hr.garnet.gapi.json.writer";
-  public static final String SC_WEB_METHOD_PROVIDER = "hr.garnet.gapi.webmethod.provider";
-  public static final String SC_EXCEPTION_HANDLER = "hr.garnet.gapi.exception.handler";
+  public static final String SC_JSON_READER = "hr.codenamecode.tapioca.json.reader";
+  public static final String SC_JSON_WRITER = "hr.codenamecode.tapioca.json.writer";
+  public static final String SC_WEB_METHOD_PROVIDER = "hr.codenamecode.tapioca.webmethod.provider";
+  public static final String SC_EXCEPTION_HANDLER = "hr.codenamecode.tapioca.exception.handler";
 
   /**
-   * Dedicated {@link ServletContext} attribute used by GAPI internally to convert incoming JSON
+   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert incoming JSON
    * request body into an instance of specified class.
    *
    * @return {@link BiFunction} performing conversion
@@ -34,7 +34,7 @@ public class Bindings {
   }
 
   /**
-   * Dedicated {@link ServletContext} attribute used by GAPI internally to convert objects into JSON
+   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert objects into JSON
    * which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
    *
    * @return {@link Function} performing conversion
@@ -45,7 +45,7 @@ public class Bindings {
   }
 
   /**
-   * Dedicated attribute used internally by GAPI as a {@link WebMethod} provider.
+   * Dedicated attribute used internally by Tapioca as a {@link WebMethod} provider.
    *
    * @return {@link Function} which provisions @{link {@link WebMethod}} to be executed by {@link
    *     Processor}.
@@ -57,7 +57,7 @@ public class Bindings {
   }
 
   /**
-   * Dedicated attribute used internally by GAPI to handle exceptions thrown during {@link
+   * Dedicated attribute used internally by Tapioca to handle exceptions thrown during {@link
    * Processor} execution.
    *
    * @return {@link ExceptionHandler} wrapped in {@link Optional}
@@ -80,7 +80,7 @@ public class Bindings {
   }
 
   /**
-   * This method should only be called by GAPI library. It is used to reduce boilerplate code needed
+   * This method should only be called by Tapioca library. It is used to reduce boilerplate code needed
    * to extract attribute from {@link ServletContext} when using static methods.
    *
    * @param sc {@link ServletContext}

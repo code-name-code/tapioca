@@ -1,10 +1,10 @@
-package hr.garnet.gapi.cars.webmethod;
+package hr.codenamecode.tapioca.cars.webmethod;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 
-import hr.garnet.gapi.WebMethod;
-import hr.garnet.gapi.Request;
-import hr.garnet.gapi.Response;
+import hr.codenamecode.tapioca.Response;
+import hr.codenamecode.tapioca.WebMethod;
+import hr.codenamecode.tapioca.Request;
 
 public class DeleteCarByBrand implements WebMethod {
 

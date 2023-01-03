@@ -1,15 +1,15 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
-import hr.garnet.gapi.internal.Processor;
-import hr.garnet.gapi.internal.ServletConfigurer;
+import hr.codenamecode.tapioca.internal.Processor;
+import hr.codenamecode.tapioca.internal.ServletConfigurer;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.function.Consumer;
 
 /**
- * GAPI library is centered around web method execution by the underlying {@link
- * jakarta.servlet.http.HttpServlet} implementation. In GAPI case, that implementation is provided
+ * Tapioca library is centered around web method execution by the underlying {@link
+ * jakarta.servlet.http.HttpServlet} implementation. In Tapioca case, that implementation is provided
  * by {@link Processor}. Basically, your API will consist of many instances of this class and each
  * will be mapped to a URI pattern. Mapping is done in classes extending {@link Api} by calling
  * {@link Api#serve(ServletConfigurer, String...)} or {@link Api#serve(Consumer, String...)} method.

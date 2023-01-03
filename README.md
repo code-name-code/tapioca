@@ -1,4 +1,12 @@
-# GAPI (Garnet API)
+# tAPIoca
+
+Tapioca (/ˌtæpiˈoʊkə/; Portuguese: [tapiˈɔkɐ]) is a starch extracted from the storage roots of the cassava plant (Manihot esculenta, also known as manioc), a species native to the North and Northeast regions of Brazil, but whose use is now spread throughout South America. It is a perennial shrub adapted to the hot conditions of tropical lowlands. Cassava copes better with poor soils than many other food plants.
+
+Tapioca is a staple food for millions of people in tropical countries. It provides only carbohydrate food value, and is low in protein, vitamins and minerals. In other countries, it is used as a thickening agent in various manufactured foods.
+
+Tapioca is derived from the word tipi'óka, its name in the Tupi language spoken by natives when the Portuguese first arrived in the Northeast Region of Brazil around 1500. This Tupi word is translated as 'sediment' or 'coagulant' and refers to the curd-like starch sediment that is obtained in the extraction process.
+
+source: [Wikipedia](https://en.wikipedia.org/wiki/Tapioca)
 
 ## Prerequisites
 
@@ -10,19 +18,19 @@
 // This example shows usage without using DI
 // For more detailed examples check ApiTest
 
-import hr.garnet.gapi.Bindings;
-import hr.garnet.gapi.WebMethod;
+import hr.codenamecode.tapioca.Bindings;
+import hr.codenamecode.tapioca.WebMethod;
 
 public class HelloWorld implements WebMethod {
 
   @Override
-  public void execute(ApiRequest req, ApiResponse resp) {
+  public void execute(Request req, Response resp) {
     resp.text(200, "Hello World!");
   }
 }
 
 @WebListener
-public class GarnetApi extends Api {
+public class CodenamecodeApi extends Api {
 
   // You could use injection here
   Jsonb jsonb = JsonbBuilder.create();

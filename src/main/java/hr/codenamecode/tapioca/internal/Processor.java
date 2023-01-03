@@ -1,10 +1,10 @@
-package hr.garnet.gapi.internal;
+package hr.codenamecode.tapioca.internal;
 
-import hr.garnet.gapi.ApiException;
-import hr.garnet.gapi.Bindings;
-import hr.garnet.gapi.Request;
-import hr.garnet.gapi.Response;
-import hr.garnet.gapi.WebMethod;
+import hr.codenamecode.tapioca.Response;
+import hr.codenamecode.tapioca.ApiException;
+import hr.codenamecode.tapioca.Bindings;
+import hr.codenamecode.tapioca.Request;
+import hr.codenamecode.tapioca.WebMethod;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

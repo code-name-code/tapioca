@@ -1,6 +1,6 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
-import hr.garnet.gapi.internal.Processor;
+import hr.codenamecode.tapioca.internal.Processor;
 
 /**
  * {@link Processor} knows how to handle these kind of exceptions. If there

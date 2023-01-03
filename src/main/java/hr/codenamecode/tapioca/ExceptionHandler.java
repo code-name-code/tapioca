@@ -1,6 +1,6 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
-import hr.garnet.gapi.internal.Processor;
+import hr.codenamecode.tapioca.internal.Processor;
 
 /**
  * This exception handler handles all exceptions which occur during servlet execution. This

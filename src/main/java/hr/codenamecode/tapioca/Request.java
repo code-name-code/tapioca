@@ -1,8 +1,8 @@
-package hr.garnet.gapi;
+package hr.codenamecode.tapioca;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
-import hr.garnet.gapi.internal.Processor;
+import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -74,7 +74,7 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * This method is used internally by GAPI to retrieve web method which will be executed by the
+   * This method is used internally by Tapioca to retrieve web method which will be executed by the
    * {@link Processor}.
    *
    * @param httpServletMapping {@link HttpServletMapping}

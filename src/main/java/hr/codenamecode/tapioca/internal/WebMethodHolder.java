@@ -1,6 +1,6 @@
-package hr.garnet.gapi.internal;
+package hr.codenamecode.tapioca.internal;
 
-import hr.garnet.gapi.WebMethod;
+import hr.codenamecode.tapioca.WebMethod;
 import java.util.Objects;
 
 /** @author vedransmid@gmail.com */
