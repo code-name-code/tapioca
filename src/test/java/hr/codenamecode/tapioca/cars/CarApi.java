@@ -69,12 +69,12 @@ public class CarApi extends Api {
 
     serve(
         api -> {
-          api.get("", GetAllCars.class);
+          api.get(GetAllCars.class);
           api.get("(?<brand>\\w+)", GetCarByBrand.class);
-          api.post("", CreateCar.class);
+          api.post(CreateCar.class);
           api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
-          api.put("", UpdateCar.class);
-          api.head("", Head.class);
+          api.put(UpdateCar.class);
+          api.head(Head.class);
         },
         "/cars/*");
   }
