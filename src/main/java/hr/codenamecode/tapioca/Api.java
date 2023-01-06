@@ -22,16 +22,19 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Extend this class to start configuring/implementing your API. In essence, this is just a
- * {@link ServletContextListener} with some sugar on top to make implementing
- * {@link jakarta.servlet.http.HttpServlet} fun and easy. It hides a lot of boilerplate from the
- * developer, and also adds a few powerful features such as mapping using regular expressions. It
- * feels like JAX-RS, but it is a lot simpler and thinner. Tapioca depends only on Jakarta Servlet
- * specification, but you can use any other Jakarta EE specification just like you would used it
- * normally when developing Jakarta EE applications/services.
+ * Extend this class to start configuring/implementing your API. In essence,
+ * this is just a {@link ServletContextListener} with some sugar on top to make
+ * implementing {@link jakarta.servlet.http.HttpServlet} fun and easy. It hides
+ * a lot of boilerplate from the developer, and also adds a few powerful
+ * features such as mapping using regular expressions. It feels like JAX-RS, but
+ * it is a lot simpler and thinner. Tapioca depends only on Jakarta Servlet
+ * specification, but you can use any other Jakarta EE specification just like
+ * you would used it normally when developing Jakarta EE applications/services.
  *
- * <p>You can register it just by using {@link jakarta.servlet.annotation.WebListener} annotation,
- * or you can add it programmatic (see tests).
+ * <p>
+ * You can register it just by using
+ * {@link jakarta.servlet.annotation.WebListener} annotation, or you can add it
+ * programmatic (see tests).
  *
  * <pre><code>
  * &#64;WebListener

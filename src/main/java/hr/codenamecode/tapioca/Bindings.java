@@ -34,8 +34,8 @@ public class Bindings {
   }
 
   /**
-   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert objects into JSON
-   * which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
+   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert objects into
+   * JSON which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
    *
    * @return {@link Function} performing conversion
    */
@@ -80,8 +80,8 @@ public class Bindings {
   }
 
   /**
-   * This method should only be called by Tapioca library. It is used to reduce boilerplate code needed
-   * to extract attribute from {@link ServletContext} when using static methods.
+   * This method should only be called by Tapioca library. It is used to reduce boilerplate code
+   * needed to extract attribute from {@link ServletContext} when using static methods.
    *
    * @param sc {@link ServletContext}
    */

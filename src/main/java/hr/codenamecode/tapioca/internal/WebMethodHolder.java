@@ -3,8 +3,11 @@ package hr.codenamecode.tapioca.internal;
 import hr.codenamecode.tapioca.WebMethod;
 import java.util.Objects;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public class WebMethodHolder {
+
   private Class<? extends WebMethod> webMethodClass;
   private WebMethod webMethodImpl;
 

@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public class Processor extends HttpServlet {
 
   private final ServletConfigurer apiConfigurer;

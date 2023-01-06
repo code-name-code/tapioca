@@ -27,9 +27,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 public class ApiTest {
 
   static Tomcat tomcat;
-  static final int port = 11112;
-  static final URI uri = URI.create("http://localhost:%d/".formatted(port));
   public static final List<Car> CARS = new ArrayList<>(1);
+  static final int PORT = 11112;
+  static final URI uri = URI.create("http://localhost:%d/".formatted(PORT));
 
   @BeforeAll
   public static void setup() throws Exception {
@@ -176,7 +176,8 @@ public class ApiTest {
 
   @Test
   @Order(11)
-  public void should_use_inline_web_method_implementation() throws IOException, InterruptedException {
+  public void should_use_inline_web_method_implementation()
+      throws IOException, InterruptedException {
     HttpRequest inlineImpl =
         HttpRequest.newBuilder(uri.resolve("exts/").resolve("inlineImpl")).GET().build();
 

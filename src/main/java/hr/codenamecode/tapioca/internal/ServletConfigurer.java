@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** @author vedransmid@gmail.com */
+/**
+ * @author vedransmid@gmail.com
+ */
 public class ServletConfigurer {
 
   private final Map<String, WebMethodHolder> postMapping = new ConcurrentHashMap<>();

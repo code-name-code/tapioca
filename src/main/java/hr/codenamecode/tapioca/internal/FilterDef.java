@@ -3,6 +3,9 @@ package hr.codenamecode.tapioca.internal;
 import jakarta.servlet.Filter;
 import java.util.Map;
 
+/**
+ * @author vedransmid@gmail.com
+ */
 public record FilterDef(
     Filter filter,
     boolean asyncSupported,

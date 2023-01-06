@@ -3,13 +3,13 @@ package hr.codenamecode.tapioca;
 import hr.codenamecode.tapioca.internal.Processor;
 
 /**
- * {@link Processor} knows how to handle these kind of exceptions. If there
- * is no global exception handler defined and {@link ApiException} is thrown inside {@link
- * WebMethod}, {@link Processor} will write status and message received
- * from the caught {@link ApiException} to the response output stream.
+ * {@link Processor} knows how to handle these kind of exceptions. If there is no global exception
+ * handler defined and {@link ApiException} is thrown inside {@link WebMethod}, {@link Processor}
+ * will write status and message received from the caught {@link ApiException} to the response
+ * output stream.
  *
  * <p>If there is no special exception handling logic required inside your {@link WebMethod} use
- * this exception to report basic textual message with http status code to the caller.
+ * this exception to report basic textual message with HTTP status code to the caller.
  *
  * @author vedransmid@gmail.com
  */
