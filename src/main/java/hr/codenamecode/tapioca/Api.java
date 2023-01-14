@@ -125,11 +125,14 @@ public abstract class Api implements ServletContextListener {
   /**
    * Set {@link ServletContext} attribute.
    *
+   * @param <T>
    * @param name Attribute name
    * @param o Attribute value
+   * @return Bound object
    */
-  protected void bind(String name, Object o) {
+  protected <T> T bind(String name, T o) {
     contextObjects.putIfAbsent(name, o);
+    return o;
   }
 
   /**
