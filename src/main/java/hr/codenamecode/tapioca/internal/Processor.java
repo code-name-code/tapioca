@@ -8,6 +8,7 @@ import hr.codenamecode.tapioca.WebMethod;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -83,13 +84,16 @@ public class Processor extends HttpServlet {
                           if (Objects.nonNull(apiException.getMessage())) {
                             resp.getWriter().append(apiException.getMessage());
                           }
-                          resp.flushBuffer();
+                        } else {
+                          resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                         }
+                        resp.flushBuffer();
                       }
                     } catch (IOException ignored) {
 
                     }
                   });
+          return;
         }
       }
     }
