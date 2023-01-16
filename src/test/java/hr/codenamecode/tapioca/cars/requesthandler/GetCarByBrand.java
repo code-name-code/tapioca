@@ -1,17 +1,17 @@
-package hr.codenamecode.tapioca.cars.webmethod;
+package hr.codenamecode.tapioca.cars.requesthandler;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
+import hr.codenamecode.tapioca.RequestHandler;
 import hr.codenamecode.tapioca.Response;
-import hr.codenamecode.tapioca.WebMethod;
 import hr.codenamecode.tapioca.Request;
 import hr.codenamecode.tapioca.ApiTest;
 import java.util.Optional;
 
-public class GetCarByBrand implements WebMethod {
+public class GetCarByBrand implements RequestHandler {
 
   @Override
-  public void invoke(Request req, Response resp) {
+  public void handle(Request req, Response resp) {
     Optional<String> brandParam = req.getPathParam("brand");
     if (brandParam.isPresent()) {
       ApiTest.CARS.stream()

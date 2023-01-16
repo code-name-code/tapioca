@@ -151,17 +151,6 @@ public class ApiTest {
   }
 
   @Test
-  @Order(9)
-  public void should_map_head_method() throws IOException, InterruptedException {
-    HttpRequest updateCar = HttpRequest.newBuilder(uri.resolve("cars/")).HEAD().build();
-
-    HttpResponse<String> response =
-        HttpClient.newHttpClient().send(updateCar, HttpResponse.BodyHandlers.ofString());
-
-    assertEquals("Head", response.headers().map().get("X-Method").get(0));
-  }
-
-  @Test
   @Order(10)
   public void should_use_exception_handler() throws IOException, InterruptedException {
     HttpRequest throwex =

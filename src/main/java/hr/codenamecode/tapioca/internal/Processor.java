@@ -4,7 +4,7 @@ import hr.codenamecode.tapioca.Response;
 import hr.codenamecode.tapioca.ApiException;
 import hr.codenamecode.tapioca.Bindings;
 import hr.codenamecode.tapioca.Request;
-import hr.codenamecode.tapioca.WebMethod;
+import hr.codenamecode.tapioca.RequestHandler;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ public class Processor extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
-    Map<String, WebMethodHolder> webMethodMappings =
+    Map<String, RequestHandlerHolder> requestHandlerMappings =
         switch (req.getMethod()) {
           case "GET" -> apiConfigurer.getGetMapping();
           case "POST" -> apiConfigurer.getPostMapping();
@@ -38,28 +38,28 @@ public class Processor extends HttpServlet {
           default -> null;
         };
 
-    if (webMethodMappings == null) {
+    if (requestHandlerMappings == null) {
       resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
       return;
     }
 
     boolean mappingFound = false;
-    for (String mapping : webMethodMappings.keySet()) {
+    for (String mapping : requestHandlerMappings.keySet()) {
       String matchedValue = Request.getMatchedValue(req.getHttpServletMapping());
       if (matchedValue.matches(mapping)) {
         Request apiReq = new Request(req, mapping);
         Response apiResp = new Response(resp);
-        WebMethodHolder webMethodHolder = webMethodMappings.get(mapping);
-        WebMethod method;
+        RequestHandlerHolder requestHandlerHolder = requestHandlerMappings.get(mapping);
+        RequestHandler method;
         mappingFound = true;
         try {
-          if (webMethodHolder.containsImplementation()) {
-            method = webMethodHolder.getWebMethodImpl();
+          if (requestHandlerHolder.containsImplementation()) {
+            method = requestHandlerHolder.getRequestHandlerImpl();
           } else {
-            method = Bindings.getCommandProvider().apply(webMethodHolder.getWebMethodClass());
+            method = Bindings.getRequestHandlerFactory().apply(requestHandlerHolder.getRequestHandlerClass());
           }
           method.setServletConfig(getServletConfig());
-          method.invoke(apiReq, apiResp);
+          method.handle(apiReq, apiResp);
           if (!resp.isCommitted()) {
             resp.flushBuffer();
           }

@@ -44,18 +44,19 @@ import java.util.function.Function;
  *   protected void configure() {
  *
  *     // Classic way of creating class instance on the fly - no dependency injection
- *     setWebMethodProvider(webMethodClass -> {
+ *     setRequestHandlerFactory(requestHandlerClass -> {
  *       try {
- *         return webMethodClass.getDeclaredConstructor().newInstance();
+ *         return requestHandlerClass.getDeclaredConstructor().newInstance();
  *       } catch (Exception e) {
  *         // handle exceptions
  *       }
  *     });
  *
  *     // CDI way of crating class instances on the fly (you could also use Guice, HK2 etc.)
- *     setWebMethodProvider(webMethodClass -> CDI.current().select(webMethodClass).get());
+ *     setRequestHandlerFactory(requestHandlerClass -> CDI.current().select(requestHandlerClass).get());
  *   }
  * }
+ * </pre>
  * </code>
  *
  * @author vedransmid@gmail.com
@@ -67,7 +68,7 @@ public abstract class Api implements ServletContextListener {
   private final Map<String, Object> contextObjects;
   private final Map<String, String> initParameters;
 
-  private Function<Class<? extends WebMethod>, WebMethod> webMethodProvider;
+  private Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory;
   private BiFunction<String, Class<?>, ?> jsonReader;
   private Function<Object, String> jsonWriter;
   private ExceptionHandler exceptionHandler;
@@ -83,14 +84,14 @@ public abstract class Api implements ServletContextListener {
   protected abstract void configure();
 
   /**
-   * Set web method provider.
+   * Set request handler provider.
    *
-   * @param webMethodProvider Function which provides web method instance to be executed by the
+   * @param requestHandlerFactory Function which provides request handler instance to be executed by the
    *     {@link Processor}
    */
-  protected void setWebMethodProvider(
-      Function<Class<? extends WebMethod>, WebMethod> webMethodProvider) {
-    this.webMethodProvider = webMethodProvider;
+  protected void setRequestHandlerFactory(
+      Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory) {
+    this.requestHandlerFactory = requestHandlerFactory;
   }
 
   /**
@@ -252,7 +253,7 @@ public abstract class Api implements ServletContextListener {
   private void setServletContext(ServletContext sc) {
     sc.setAttribute(Bindings.SC_JSON_READER, jsonReader);
     sc.setAttribute(Bindings.SC_JSON_WRITER, jsonWriter);
-    sc.setAttribute(Bindings.SC_WEB_METHOD_PROVIDER, webMethodProvider);
+    sc.setAttribute(Bindings.SC_REQUEST_HANDLER_FACTORY, requestHandlerFactory);
     sc.setAttribute(Bindings.SC_EXCEPTION_HANDLER, exceptionHandler);
 
     initParameters.forEach(sc::setInitParameter);

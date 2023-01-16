@@ -19,7 +19,7 @@ public class Bindings {
 
   public static final String SC_JSON_READER = "hr.codenamecode.tapioca.json.reader";
   public static final String SC_JSON_WRITER = "hr.codenamecode.tapioca.json.writer";
-  public static final String SC_WEB_METHOD_PROVIDER = "hr.codenamecode.tapioca.webmethod.provider";
+  public static final String SC_REQUEST_HANDLER_FACTORY = "hr.codenamecode.tapioca.requesthandler.factory";
   public static final String SC_EXCEPTION_HANDLER = "hr.codenamecode.tapioca.exception.handler";
 
   /**
@@ -45,15 +45,15 @@ public class Bindings {
   }
 
   /**
-   * Dedicated attribute used internally by Tapioca as a {@link WebMethod} provider.
+   * Dedicated attribute used internally by Tapioca as a {@link RequestHandler} provider.
    *
-   * @return {@link Function} which provisions @{link {@link WebMethod}} to be executed by {@link
+   * @return {@link Function} which provisions @{link {@link RequestHandler}} to be executed by {@link
    *     Processor}.
    */
   @SuppressWarnings("unchecked")
-  public static Function<Class<? extends WebMethod>, WebMethod> getCommandProvider() {
-    return (Function<Class<? extends WebMethod>, WebMethod>)
-        servletContext.getAttribute(SC_WEB_METHOD_PROVIDER);
+  public static Function<Class<? extends RequestHandler>, RequestHandler> getRequestHandlerFactory() {
+    return (Function<Class<? extends RequestHandler>, RequestHandler>)
+        servletContext.getAttribute(SC_REQUEST_HANDLER_FACTORY);
   }
 
   /**

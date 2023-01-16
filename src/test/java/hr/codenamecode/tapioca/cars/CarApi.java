@@ -2,13 +2,12 @@ package hr.codenamecode.tapioca.cars;
 
 import hr.codenamecode.tapioca.Api;
 import hr.codenamecode.tapioca.Bindings;
-import hr.codenamecode.tapioca.cars.webmethod.CreateCar;
-import hr.codenamecode.tapioca.cars.webmethod.DeleteCarByBrand;
-import hr.codenamecode.tapioca.cars.webmethod.GetAllCars;
-import hr.codenamecode.tapioca.cars.webmethod.GetCarByBrand;
-import hr.codenamecode.tapioca.cars.webmethod.Head;
-import hr.codenamecode.tapioca.cars.webmethod.ThrowEx;
-import hr.codenamecode.tapioca.cars.webmethod.UpdateCar;
+import hr.codenamecode.tapioca.cars.requesthandler.CreateCar;
+import hr.codenamecode.tapioca.cars.requesthandler.DeleteCarByBrand;
+import hr.codenamecode.tapioca.cars.requesthandler.GetAllCars;
+import hr.codenamecode.tapioca.cars.requesthandler.GetCarByBrand;
+import hr.codenamecode.tapioca.cars.requesthandler.ThrowEx;
+import hr.codenamecode.tapioca.cars.requesthandler.UpdateCar;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +20,7 @@ public class CarApi extends Api {
 
   @Override
   protected void configure() {
-    setWebMethodProvider(
+    setRequestHandlerFactory(
         aClass -> {
           try {
             return aClass.getDeclaredConstructor().newInstance();
@@ -74,7 +73,6 @@ public class CarApi extends Api {
           api.post(CreateCar.class);
           api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
           api.put(UpdateCar.class);
-          api.head(Head.class);
         },
         "/cars/*");
   }

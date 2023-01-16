@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper around {@link HttpServletResponse} which provides some additional, convenient methods out
- * of the box. Used by {@link WebMethod}.
+ * of the box. Used by {@link RequestHandler}.
  *
  * @author vedransmid@gmail.com
  */

@@ -4,7 +4,7 @@ import hr.codenamecode.tapioca.internal.Processor;
 
 /**
  * This exception handler handles all exceptions which occur during servlet execution. This
- * basically means that you can delegate all exception handling logic in your {@link WebMethod}
+ * basically means that you can delegate all exception handling logic in your {@link RequestHandler}
  * implementations to the custom exception handler implementation. You can register custom exception
  * handler in classes extending {@link Api} by calling {@link
  * Api#setExceptionHandler(ExceptionHandler)} method.

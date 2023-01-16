@@ -19,76 +19,77 @@ source: [Wikipedia](https://en.wikipedia.org/wiki/Tapioca)
 // For more detailed examples check ApiTest
 
 import hr.codenamecode.tapioca.Bindings;
-import hr.codenamecode.tapioca.WebMethod;
+import hr.codenamecode.tapioca.RequestHandler;
+import hr.codenamecode.tapioca.RequestHandler;
 
-public class HelloWorld implements WebMethod {
+public class HelloWorld implements RequestHandler {
 
-  @Override
-  public void execute(Request req, Response resp) {
-    resp.text(200, "Hello World!");
-  }
+    @Override
+    public void execute(Request req, Response resp) {
+        resp.text(200, "Hello World!");
+    }
 }
 
 @WebListener
 public class CodenamecodeApi extends Api {
 
-  // You could use injection here
-  Jsonb jsonb = JsonbBuilder.create();
+    // You could use injection here
+    Jsonb jsonb = JsonbBuilder.create();
 
-  // DI is also available here
+    // DI is also available here
 
-  @Override
-  protected void configure() {
-    // How web methods are created
-    // e.g. CDI - setWebMethodProvider(webMethodClass -> CDI.current().select(webMethodClass).get());
-    // Instead CDI you could also use Guice, HK2 etc.
-    setWebMethodProvider(webMethodClass -> {
-      try {
-        // Classic way of creating class instances on the fly
-        return webMethodClass.getDeclaredConstructor().newInstance();
-      } catch (Exception e) {
-        // handle exceptions
-      }
-    });
-
-    // Set global exception handler
-    setExceptionHandler(
-        (e, req, resp) -> {
-          try {
-            resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write(e.getMessage());
-          } catch (IOException ignored) {
-
-          }
+    @Override
+    protected void configure() {
+        // How request handlers are created
+        // e.g. CDI - setRequestHandlerFactory(requestHandlerClass -> CDI.current().select(requestHandlerClass).get());
+        // Instead CDI you could also use Guice, HK2 etc.
+        setRequestHandlerFactory(requestHandlerClass -> {
+            try {
+                // Classic way of creating class instances on the fly
+                return requestHandlerClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                // handle exceptions
+            }
         });
 
-    // In case you wish to use json, you can provide reader and writer to benefit
-    // from ApiResponse in-built helper methods
-    setJsonReader((s, aClass) -> jsonb.fromJson(s, aClass));
-    setJsonWriter(jsonb::toJson);
+        // Set global exception handler
+        setExceptionHandler(
+                (e, req, resp) -> {
+                    try {
+                        resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                        resp.getWriter().write(e.getMessage());
+                    } catch (IOException ignored) {
 
-    bind("key", "Bind anything to the servlet context as attribute");
-    setInitParameter("name", "Set servlet context initial parameter");
+                    }
+                });
 
-    // Define filter for /*
-    filter(
-        (servletRequest, servletResponse, filterChain) -> {
-          // Print bound servlet context key value
-          System.out.println(Bindings.<String>lookup("key"));
-          filterChain.doFilter(servletRequest, servletResponse);
-        },
-        "/*");
+        // In case you wish to use json, you can provide reader and writer to benefit
+        // from ApiResponse in-built helper methods
+        setJsonReader((s, aClass) -> jsonb.fromJson(s, aClass));
+        setJsonWriter(jsonb::toJson);
 
-    // Define servlet (you can have as many as you like)
-    serve(api -> {
-      // api.setUrlPatterns("/*"); you can set url patterns here
-      // or in serve method (takes precedence)
+        bind("key", "Bind anything to the servlet context as attribute");
+        setInitParameter("name", "Set servlet context initial parameter");
 
-      api.post("", HelloWorld.class); // define post method
+        // Define filter for /*
+        filter(
+                (servletRequest, servletResponse, filterChain) -> {
+                    // Print bound servlet context key value
+                    System.out.println(Bindings.<String>lookup("key"));
+                    filterChain.doFilter(servletRequest, servletResponse);
+                },
+                "/*");
 
-      // Define get method by providing immediate implementation
-      api.get("inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inline impl.".getBytes()));
-    }, "/*");
-  }
+        // Define servlet (you can have as many as you like)
+        serve(api -> {
+            // api.setUrlPatterns("/*"); you can set url patterns here
+            // or in serve method (takes precedence)
+
+            api.post("", HelloWorld.class); // define post method
+
+            // Define get method by providing immediate implementation
+            api.get("inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inline impl.".getBytes()));
+        }, "/*");
+    }
 }
 ```
