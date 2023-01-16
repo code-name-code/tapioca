@@ -84,7 +84,7 @@ public class CodenamecodeApi extends Api {
             // api.setUrlPatterns("/*"); you can set url patterns here
             // or in serve method (takes precedence)
 
-            api.post("", HelloWorld.class); // define post method
+            api.post(HelloWorld.class); // define post method, mapped as "" path
 
             // Define get method by providing immediate implementation
             api.get("inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inline impl.".getBytes()));
