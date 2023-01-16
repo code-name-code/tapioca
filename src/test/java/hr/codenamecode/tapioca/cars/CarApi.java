@@ -54,7 +54,7 @@ public class CarApi extends Api {
         },
         "/*");
 
-    serve(
+    servlet(
         api -> {
           api.get(
               "contextObject",
@@ -66,7 +66,7 @@ public class CarApi extends Api {
         },
         "/exts/*");
 
-    serve(
+    servlet(
         api -> {
           api.get(GetAllCars.class);
           api.get("(?<brand>\\w+)", GetCarByBrand.class);

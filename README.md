@@ -20,12 +20,11 @@ source: [Wikipedia](https://en.wikipedia.org/wiki/Tapioca)
 
 import hr.codenamecode.tapioca.Bindings;
 import hr.codenamecode.tapioca.RequestHandler;
-import hr.codenamecode.tapioca.RequestHandler;
 
 public class HelloWorld implements RequestHandler {
 
     @Override
-    public void execute(Request req, Response resp) {
+    public void handle(Request req, Response resp) {
         resp.text(200, "Hello World!");
     }
 }
@@ -80,8 +79,8 @@ public class CodenamecodeApi extends Api {
                 },
                 "/*");
 
-        // Define servlet (you can have as many as you like)
-        serve(api -> {
+        // Define servlet (you can have as many servlets as you like)
+        servlet(api -> {
             // api.setUrlPatterns("/*"); you can set url patterns here
             // or in serve method (takes precedence)
 
