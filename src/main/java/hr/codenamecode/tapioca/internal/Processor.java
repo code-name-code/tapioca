@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +41,7 @@ public class Processor extends HttpServlet {
         };
 
     if (requestHandlerMappings == null) {
-      resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+      resp.setStatus(SC_NOT_IMPLEMENTED);
       return;
     }
 
@@ -99,7 +101,7 @@ public class Processor extends HttpServlet {
     }
 
     if (!mappingFound) {
-      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      resp.setStatus(SC_NOT_FOUND);
     }
   }
 }
