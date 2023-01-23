@@ -5,6 +5,7 @@ import hr.codenamecode.tapioca.ApiException;
 import hr.codenamecode.tapioca.Bindings;
 import hr.codenamecode.tapioca.Request;
 import hr.codenamecode.tapioca.RequestHandler;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,7 +59,9 @@ public class Processor extends HttpServlet {
           if (requestHandlerHolder.containsImplementation()) {
             method = requestHandlerHolder.getRequestHandlerImpl();
           } else {
-            method = Bindings.getRequestHandlerFactory().apply(requestHandlerHolder.getRequestHandlerClass());
+            method =
+                Bindings.getRequestHandlerFactory()
+                    .apply(requestHandlerHolder.getRequestHandlerClass());
           }
           method.setServletConfig(getServletConfig());
           method.handle(apiReq, apiResp);
@@ -101,7 +104,15 @@ public class Processor extends HttpServlet {
     }
 
     if (!mappingFound) {
-      resp.setStatus(SC_NOT_FOUND);
+      if ("OPTIONS".equals(req.getMethod())) {
+        try {
+          doOptions(req, resp);
+        } catch (ServletException | IOException ex) {
+          resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+        }
+      } else {
+        resp.setStatus(SC_NOT_FOUND);
+      }
     }
   }
 }
