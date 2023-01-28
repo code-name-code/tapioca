@@ -2,6 +2,7 @@ package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.ServletContext;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -28,10 +29,13 @@ public class Bindings {
    * request body into an instance of specified class.
    *
    * @return {@link BiFunction} performing conversion
+   * @throws NullPointerException
    */
   @SuppressWarnings("unchecked")
-  public static BiFunction<String, Class<?>, ?> getJsonReader() {
-    return (BiFunction<String, Class<?>, ?>) servletContext.getAttribute(SC_JSON_READER);
+  public static BiFunction<String, Class<?>, ?> getJsonReader() throws NullPointerException {
+    Object reader = servletContext.getAttribute(SC_JSON_READER);
+    return (BiFunction<String, Class<?>, ?>)
+        Objects.requireNonNull(reader, "JSON reader is not provided");
   }
 
   /**
@@ -39,10 +43,12 @@ public class Bindings {
    * JSON which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
    *
    * @return {@link Function} performing conversion
+   * @throws NullPointerException
    */
   @SuppressWarnings("unchecked")
-  public static Function<Object, String> getJsonWriter() {
-    return (Function<Object, String>) servletContext.getAttribute(SC_JSON_WRITER);
+  public static Function<Object, String> getJsonWriter() throws NullPointerException {
+    Object writer = servletContext.getAttribute(SC_JSON_WRITER);
+    return (Function<Object, String>) Objects.requireNonNull(writer, "JSON writer is not provided");
   }
 
   /**
@@ -50,12 +56,14 @@ public class Bindings {
    *
    * @return {@link Function} which provisions @{link {@link RequestHandler}} to be executed by
    *     {@link Processor}.
+   * @throws NullPointerException
    */
   @SuppressWarnings("unchecked")
-  public static Function<Class<? extends RequestHandler>, RequestHandler>
-      getRequestHandlerFactory() {
+  public static Function<Class<? extends RequestHandler>, RequestHandler> getRequestHandlerFactory()
+      throws NullPointerException {
+    Object requestHandlerFactory = servletContext.getAttribute(SC_REQUEST_HANDLER_FACTORY);
     return (Function<Class<? extends RequestHandler>, RequestHandler>)
-        servletContext.getAttribute(SC_REQUEST_HANDLER_FACTORY);
+        Objects.requireNonNull(requestHandlerFactory, "Request handler factory is not provided");
   }
 
   /**
@@ -63,20 +71,29 @@ public class Bindings {
    * Processor} execution.
    *
    * @return {@link ExceptionHandler} wrapped in {@link Optional}
+   * @throws NullPointerException
    */
-  public static ExceptionHandler getExceptionHandler() {
-    return (ExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER);
+  public static ExceptionHandler getExceptionHandler() throws NullPointerException {
+    Object exceptionHandler = servletContext.getAttribute(SC_EXCEPTION_HANDLER);
+    return (ExceptionHandler)
+        Objects.requireNonNull(exceptionHandler, "Exception handler is not provided");
   }
 
   /**
-   * Get any attribute from {@link ServletContext} by attribute's name. Attributes should be bound
-   * to {@link ServletContext} using {@link Api#bind(String, Object)} method.
+   * Get any attribute from {@link ServletContext} by attribute's name.Attributes should be bound to
+   * {@link ServletContext} using {@link Api#bind(String, Object)} method.
    *
+   * @param <T>
    * @param name Attribute name
    * @return Attribute value found in the {@link ServletContext} for the given attribute name
+   * @throws NoSuchElementException
    */
   @SuppressWarnings("unchecked")
-  public static <T> T lookup(String name) {
+  public static <T> T lookup(String name) throws NoSuchElementException {
+    Object attribute = servletContext.getAttribute(name);
+    if (attribute == null) {
+      throw new NoSuchElementException("Attribute [%s] is not bound".formatted(name));
+    }
     return (T) servletContext.getAttribute(name);
   }
 

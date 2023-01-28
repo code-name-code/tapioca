@@ -54,10 +54,10 @@ public class Request extends HttpServletRequestWrapper {
 
   /**
    * Converts incoming request body into an instance of provided class. This method should be called
-   * only once per request handler otherwise exception will be thrown (stream can be read only once).
-   * This method assumes that incoming request body is of <b>application/json</b> media type. If
-   * conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status is
-   * thrown.
+   * only once per request handler otherwise exception will be thrown (stream can be read only
+   * once). This method assumes that incoming request body is of <b>application/json</b> media type.
+   * If conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status
+   * is thrown.
    *
    * @param <T>
    * @param clazz Targeted object instance class
@@ -74,17 +74,18 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * This method is used internally by Tapioca to retrieve request handler which will be executed by the
-   * {@link Processor}.
+   * This method is used internally by Tapioca to retrieve request handler which will be executed by
+   * the {@link Processor}.
    *
    * @param httpServletMapping {@link HttpServletMapping}
    * @return A part or request's URI which is matched by the servlet. This URI part is then matched
-   *     against each key in the {@link java.util.HashMap} containing request handler mappings. For more
-   *     details on how matching is done, see {@link Processor}.
+   *     against each key in the {@link java.util.HashMap} containing request handler mappings. For
+   *     more details on how matching is done, see {@link Processor}.
    */
   public static String getMatchedValue(HttpServletMapping httpServletMapping) {
     return switch (httpServletMapping.getMappingMatch()) {
-      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire request handler mapped to ""
+      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire request handler mapped to
+        // ""
       case PATH -> httpServletMapping.getMatchValue();
       default -> null;
     };

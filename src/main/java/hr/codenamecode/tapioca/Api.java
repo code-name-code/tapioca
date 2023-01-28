@@ -85,13 +85,16 @@ public abstract class Api implements ServletContextListener {
   protected abstract void configure();
 
   /**
-   * Set request handler provider.
+   * Set request handler provider. If no request handler factory is set, a default one is used,
+   * {@link Defaults#DEFAULT_REQUEST_HANDLER_FACTORY}
    *
    * @param requestHandlerFactory Function which provides request handler instance to be executed by
    *     the {@link Processor}
+   * @throws NullPointerException
    */
   protected void setRequestHandlerFactory(
-      Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory) {
+      Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory)
+      throws NullPointerException {
     this.requestHandlerFactory = Objects.requireNonNull(requestHandlerFactory);
   }
 
@@ -100,8 +103,10 @@ public abstract class Api implements ServletContextListener {
    *
    * @param jsonReader Reader used internally by the Tapioca to convert incoming request body
    *     containing JSON content into an instance of provided class.
+   * @throws NullPointerException
    */
-  protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader) {
+  protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader)
+      throws NullPointerException {
     this.jsonReader = Objects.requireNonNull(jsonReader);
   }
 
@@ -110,17 +115,21 @@ public abstract class Api implements ServletContextListener {
    *
    * @param jsonWriter Used internally by the Tapioca to write JSON content to the {@link Processor}
    *     output stream.
+   * @throws NullPointerException
    */
-  protected void setJsonWriter(Function<Object, String> jsonWriter) {
+  protected void setJsonWriter(Function<Object, String> jsonWriter) throws NullPointerException {
     this.jsonWriter = Objects.requireNonNull(jsonWriter);
   }
 
   /**
-   * Set global exception handler.
+   * Set exception handler. If no exception handler is set, a default one is used, {@link
+   * Defaults#DEFAULT_EXCEPTION_HANDLER}
    *
    * @param exceptionHandler {@link ExceptionHandler}
+   * @throws NullPointerException
    */
-  protected void setExceptionHandler(ExceptionHandler exceptionHandler) {
+  protected void setExceptionHandler(ExceptionHandler exceptionHandler)
+      throws NullPointerException {
     this.exceptionHandler = Objects.requireNonNull(exceptionHandler);
   }
 

@@ -42,6 +42,7 @@ public class CodenamecodeApi extends Api {
         // How request handlers are created
         // e.g. CDI - setRequestHandlerFactory(requestHandlerClass -> CDI.current().select(requestHandlerClass).get());
         // Instead CDI you could also use Guice, HK2 etc.
+        // If no request handler factory is set, a default one is used (see Defaults.DEFAULT_REQUEST_HANDLER_FACTORY)
         setRequestHandlerFactory(requestHandlerClass -> {
             try {
                 // Classic way of creating class instances on the fly
@@ -51,7 +52,8 @@ public class CodenamecodeApi extends Api {
             }
         });
 
-        // Set global exception handler
+        // Set exception handler
+        // If no exception handler is set, a default one is used (see Defaults.DEFAULT_EXCEPTION_HANDLER)
         setExceptionHandler(
                 (e, req, resp) -> {
                     try {
