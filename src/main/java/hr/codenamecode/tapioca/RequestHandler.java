@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.function.Consumer;
 
 /**
- * Tapioca library is centred around request handler execution by the underlying {@link
+ * Tapioca library is centered around request handler execution by the underlying {@link
  * jakarta.servlet.http.HttpServlet} implementation. In Tapioca case, that implementation is
  * provided by {@link Processor}. Basically, your API will consist of many instances of this class
  * and each will be mapped to a URI pattern. Mapping is done in classes extending {@link Api} by
