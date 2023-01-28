@@ -2,14 +2,11 @@ package hr.codenamecode.tapioca;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
-import hr.codenamecode.tapioca.internal.Processor;
-import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Wrapper around {@link HttpServletRequest} which provides some additional, convenient methods out
@@ -25,12 +22,15 @@ public class Request extends HttpServletRequestWrapper {
    *
    * <p>e.g. <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b>
    */
-  private final Matcher pathMatcher;
+  private Matcher pathMatcher;
 
-  public Request(HttpServletRequest request, String mapping) {
+  public Request(HttpServletRequest request) {
     super(request);
-    String matchedValue = getMatchedValue(request.getHttpServletMapping());
-    this.pathMatcher = Pattern.compile(mapping).matcher(matchedValue);
+  }
+
+  public Request(HttpServletRequest request, Matcher pathMatcher) {
+    super(request);
+    this.pathMatcher = pathMatcher;
   }
 
   /**
@@ -44,6 +44,10 @@ public class Request extends HttpServletRequestWrapper {
    * @return Path parameter value for the provided path parameter name
    */
   public Optional<String> getPathParam(String name) {
+    if (pathMatcher == null) {
+      throw new IllegalStateException("Path matcher is not provided");
+    }
+
     try {
       boolean match = pathMatcher.find();
       return Optional.ofNullable(match ? pathMatcher.group(name) : null);
@@ -71,23 +75,5 @@ public class Request extends HttpServletRequestWrapper {
     } catch (IOException e) {
       throw new ApiException(SC_BAD_REQUEST);
     }
-  }
-
-  /**
-   * This method is used internally by Tapioca to retrieve request handler which will be executed by
-   * the {@link Processor}.
-   *
-   * @param httpServletMapping {@link HttpServletMapping}
-   * @return A part or request's URI which is matched by the servlet. This URI part is then matched
-   *     against each key in the {@link java.util.HashMap} containing request handler mappings. For
-   *     more details on how matching is done, see {@link Processor}.
-   */
-  public static String getMatchedValue(HttpServletMapping httpServletMapping) {
-    return switch (httpServletMapping.getMappingMatch()) {
-      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire request handler mapped to
-        // ""
-      case PATH -> httpServletMapping.getMatchValue();
-      default -> null;
-    };
   }
 }

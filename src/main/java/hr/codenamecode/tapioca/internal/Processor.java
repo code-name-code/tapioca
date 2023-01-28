@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author vedransmid@gmail.com
@@ -45,7 +47,7 @@ public class Processor extends HttpServlet {
       return;
     }
 
-    Request apiReq = new Request(req, matchedMapping);
+    Request apiReq = new Request(req, getPathMatcher(req, matchedMapping));
     Response apiResp = new Response(resp);
 
     try {
@@ -90,16 +92,39 @@ public class Processor extends HttpServlet {
     };
   }
 
+  private Matcher getPathMatcher(HttpServletRequest req, String matchedMapping) {
+    String matchedValue = getMatchedValue(req.getHttpServletMapping());
+    return Pattern.compile(matchedMapping).matcher(matchedValue);
+  }
+
   private String getMatchedMapping(
       Map<String, RequestHandlerHolder> requestHandlers, HttpServletMapping httpServletMapping) {
 
     for (String mapping : requestHandlers.keySet()) {
-      String matchedValue = Request.getMatchedValue(httpServletMapping);
+      String matchedValue = getMatchedValue(httpServletMapping);
       if (matchedValue != null && matchedValue.matches(mapping)) {
         return mapping;
       }
     }
 
     return null;
+  }
+
+  /**
+   * This method is used internally by Tapioca to retrieve request handler which will be executed by
+   * the {@link Processor}.
+   *
+   * @param httpServletMapping {@link HttpServletMapping}
+   * @return A part or request's URI which is matched by the servlet. This URI part is then matched
+   *     against each key in the {@link java.util.HashMap} containing request handler mappings. For
+   *     more details on how matching is done, see {@link Processor}.
+   */
+  private String getMatchedValue(HttpServletMapping httpServletMapping) {
+    return switch (httpServletMapping.getMappingMatch()) {
+      case EXACT -> ""; // to accept empty mapping, e.g. /test should fire request handler mapped to
+        // ""
+      case PATH -> httpServletMapping.getMatchValue();
+      default -> null;
+    };
   }
 }
