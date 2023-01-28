@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -75,6 +76,9 @@ public abstract class Api implements ServletContextListener {
     this.initParameters = new HashMap<>();
     this.servlets = new ArrayList<>();
     this.filters = new LinkedHashSet<>();
+
+    this.requestHandlerFactory = Defaults.DEFAULT_REQUEST_HANDLER_FACTORY;
+    this.exceptionHandler = Defaults.DEFAULT_EXCEPTION_HANDLER;
   }
 
   /** Implement this method to configure servlets, filters etc. */
@@ -88,7 +92,7 @@ public abstract class Api implements ServletContextListener {
    */
   protected void setRequestHandlerFactory(
       Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory) {
-    this.requestHandlerFactory = requestHandlerFactory;
+    this.requestHandlerFactory = Objects.requireNonNull(requestHandlerFactory);
   }
 
   /**
@@ -98,7 +102,7 @@ public abstract class Api implements ServletContextListener {
    *     containing JSON content into an instance of provided class.
    */
   protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader) {
-    this.jsonReader = jsonReader;
+    this.jsonReader = Objects.requireNonNull(jsonReader);
   }
 
   /**
@@ -108,7 +112,7 @@ public abstract class Api implements ServletContextListener {
    *     output stream.
    */
   protected void setJsonWriter(Function<Object, String> jsonWriter) {
-    this.jsonWriter = jsonWriter;
+    this.jsonWriter = Objects.requireNonNull(jsonWriter);
   }
 
   /**
@@ -117,7 +121,7 @@ public abstract class Api implements ServletContextListener {
    * @param exceptionHandler {@link ExceptionHandler}
    */
   protected void setExceptionHandler(ExceptionHandler exceptionHandler) {
-    this.exceptionHandler = exceptionHandler;
+    this.exceptionHandler = Objects.requireNonNull(exceptionHandler);
   }
 
   /**
@@ -211,9 +215,9 @@ public abstract class Api implements ServletContextListener {
    * {@link Processor}. Each call to this method will create a new instance of {@link Processor}.
    * Configuring servlet using this method offers same functionalities as {@link
    * jakarta.servlet.ServletRegistration.Dynamic} through {@link ServletConfigurer}. This method
-   * offers functional alternative to {@link Api#servlet(ServletConfigurer, String[])} method through
-   * {@link Consumer}. This way you provide inline servlet configuration without the need for
-   * creating a separate class.
+   * offers functional alternative to {@link Api#servlet(ServletConfigurer, String[])} method
+   * through {@link Consumer}. This way you provide inline servlet configuration without the need
+   * for creating a separate class.
    *
    * @param apiConfigurerConsumer {@link ServletConfigurer} consumer
    * @param urlPatterns URL patterns this servlet will be serving
@@ -237,6 +241,7 @@ public abstract class Api implements ServletContextListener {
     Bindings.setServletContext(sce.getServletContext());
 
     configure();
+
     setServletContext(sce.getServletContext());
     registerFilters(sce.getServletContext());
     registerServlets(sce.getServletContext());

@@ -19,7 +19,8 @@ public class Bindings {
 
   public static final String SC_JSON_READER = "hr.codenamecode.tapioca.json.reader";
   public static final String SC_JSON_WRITER = "hr.codenamecode.tapioca.json.writer";
-  public static final String SC_REQUEST_HANDLER_FACTORY = "hr.codenamecode.tapioca.requesthandler.factory";
+  public static final String SC_REQUEST_HANDLER_FACTORY =
+      "hr.codenamecode.tapioca.requesthandler.factory";
   public static final String SC_EXCEPTION_HANDLER = "hr.codenamecode.tapioca.exception.handler";
 
   /**
@@ -47,11 +48,12 @@ public class Bindings {
   /**
    * Dedicated attribute used internally by Tapioca as a {@link RequestHandler} provider.
    *
-   * @return {@link Function} which provisions @{link {@link RequestHandler}} to be executed by {@link
-   *     Processor}.
+   * @return {@link Function} which provisions @{link {@link RequestHandler}} to be executed by
+   *     {@link Processor}.
    */
   @SuppressWarnings("unchecked")
-  public static Function<Class<? extends RequestHandler>, RequestHandler> getRequestHandlerFactory() {
+  public static Function<Class<? extends RequestHandler>, RequestHandler>
+      getRequestHandlerFactory() {
     return (Function<Class<? extends RequestHandler>, RequestHandler>)
         servletContext.getAttribute(SC_REQUEST_HANDLER_FACTORY);
   }
@@ -62,9 +64,8 @@ public class Bindings {
    *
    * @return {@link ExceptionHandler} wrapped in {@link Optional}
    */
-  public static Optional<ExceptionHandler> getExceptionHandler() {
-    return Optional.ofNullable(
-        (ExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER));
+  public static ExceptionHandler getExceptionHandler() {
+    return (ExceptionHandler) servletContext.getAttribute(SC_EXCEPTION_HANDLER);
   }
 
   /**

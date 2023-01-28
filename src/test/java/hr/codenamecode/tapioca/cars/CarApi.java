@@ -11,8 +11,6 @@ import hr.codenamecode.tapioca.cars.requesthandler.UpdateCar;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 public class CarApi extends Api {
 
@@ -20,30 +18,9 @@ public class CarApi extends Api {
 
   @Override
   protected void configure() {
-    setRequestHandlerFactory(
-        aClass -> {
-          try {
-            return aClass.getDeclaredConstructor().newInstance();
-          } catch (InstantiationException
-              | IllegalAccessException
-              | NoSuchMethodException
-              | InvocationTargetException e) {
-            return null;
-          }
-        });
 
     setJsonReader(jsonb::fromJson);
     setJsonWriter(jsonb::toJson);
-
-    setExceptionHandler(
-        (e, req, resp) -> {
-          try {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write(e.getMessage());
-          } catch (IOException ignored) {
-
-          }
-        });
 
     bind("key", "ok");
 

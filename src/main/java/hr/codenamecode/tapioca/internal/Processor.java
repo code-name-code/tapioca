@@ -1,9 +1,7 @@
 package hr.codenamecode.tapioca.internal;
 
 import hr.codenamecode.tapioca.Response;
-import hr.codenamecode.tapioca.ApiException;
 import hr.codenamecode.tapioca.Bindings;
-import hr.codenamecode.tapioca.ExceptionHandler;
 import hr.codenamecode.tapioca.Request;
 import hr.codenamecode.tapioca.RequestHandler;
 import jakarta.servlet.ServletException;
@@ -11,11 +9,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author vedransmid@gmail.com
@@ -35,10 +30,9 @@ public class Processor extends HttpServlet {
     if (requestHandlers == null || requestHandlers.isEmpty()) {
       try {
         super.service(req, resp);
-        return;
       } catch (ServletException | IOException ex) {
-        return;
       }
+      return;
     }
 
     String matchedMapping = getMatchedMapping(requestHandlers, req.getHttpServletMapping());
@@ -46,18 +40,18 @@ public class Processor extends HttpServlet {
     if (matchedMapping == null) {
       try {
         super.service(req, resp);
-        return;
       } catch (ServletException | IOException ex) {
-        return;
       }
+      return;
     }
 
     Request apiReq = new Request(req, matchedMapping);
     Response apiResp = new Response(resp);
-    RequestHandlerHolder requestHandlerHolder = requestHandlers.get(matchedMapping);
-    RequestHandler method;
 
     try {
+      RequestHandler method;
+      RequestHandlerHolder requestHandlerHolder = requestHandlers.get(matchedMapping);
+
       if (requestHandlerHolder.containsImplementation()) {
         method = requestHandlerHolder.getRequestHandlerImpl();
       } else {
@@ -65,39 +59,20 @@ public class Processor extends HttpServlet {
             Bindings.getRequestHandlerFactory()
                 .apply(requestHandlerHolder.getRequestHandlerClass());
       }
+
       method.setServletConfig(getServletConfig());
       method.handle(apiReq, apiResp);
+
       if (!resp.isCommitted()) {
         resp.flushBuffer();
       }
     } catch (Exception e) {
-      Optional<ExceptionHandler> exceptionHandler = Bindings.getExceptionHandler();
-
-      if (exceptionHandler.isPresent()) {
-        exceptionHandler.get().handleException(e, apiReq, apiResp);
-        try {
-          if (!resp.isCommitted()) {
-            resp.flushBuffer();
-          }
-        } catch (IOException ignored) {
-
+      Bindings.getExceptionHandler().handleException(e, apiReq, apiResp);
+      try {
+        if (!resp.isCommitted()) {
+          resp.flushBuffer();
         }
-      } else {
-        try {
-          if (!resp.isCommitted()) {
-            if (e instanceof ApiException apiException) {
-              resp.setStatus(apiException.getStatus());
-              if (Objects.nonNull(apiException.getMessage())) {
-                resp.getWriter().append(apiException.getMessage());
-              }
-            } else {
-              resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-            }
-            resp.flushBuffer();
-          }
-        } catch (IOException ignored) {
-
-        }
+      } catch (IOException ignored) {
       }
     }
   }
