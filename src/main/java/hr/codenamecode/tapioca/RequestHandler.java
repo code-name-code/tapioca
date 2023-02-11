@@ -3,12 +3,13 @@ package hr.codenamecode.tapioca;
 import hr.codenamecode.tapioca.internal.Processor;
 import hr.codenamecode.tapioca.internal.ServletConfigurer;
 import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.function.Consumer;
 
 /**
- * Tapioca library is centered around request handler execution by the underlying {@link
+ * Tapioca library is cantered around request handler execution by the underlying {@link
  * jakarta.servlet.http.HttpServlet} implementation. In Tapioca case, that implementation is
  * provided by {@link Processor}. Basically, your API will consist of many instances of this class
  * and each will be mapped to a URI pattern. Mapping is done in classes extending {@link Api} by
@@ -29,10 +30,13 @@ public interface RequestHandler {
 
   /**
    * Method which will be executed by the {@link Processor} if incoming request matches mapping for
-   * this request handler. For more details on how matching is done, see {@link Processor}.
+   * this request handler.For more details on how matching is done, see {@link Processor}.
    *
    * @param req Wrapper around {@link HttpServletRequest} with additional, convenient methods
    * @param resp Wrapper around {@link HttpServletResponse} with additional, convenient methods
+   * @throws java.lang.Exception
+   * @throws {@link java.lang.Exception} Allows simpler {@link RequestHandler} implementations when
+   *     used in combination with {@link ExceptionHandler}.
    */
-  void handle(Request req, Response resp);
+  void handle(Request req, Response resp) throws Exception;
 }
