@@ -24,13 +24,14 @@ public class Defaults {
 
   public static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER =
       (e, req, resp) -> {
+        if (e == null || resp == null) return;
         try {
           if (e instanceof ApiException apiException) {
             resp.setStatus(apiException.getStatus());
+            resp.getWriter().write(e.getMessage());
           } else {
             resp.setStatus(SC_INTERNAL_SERVER_ERROR);
           }
-          resp.getWriter().write(e.getMessage());
         } catch (IOException ignored) {
 
         }

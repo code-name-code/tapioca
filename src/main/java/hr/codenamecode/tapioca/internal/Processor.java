@@ -2,6 +2,7 @@ package hr.codenamecode.tapioca.internal;
 
 import hr.codenamecode.tapioca.Response;
 import hr.codenamecode.tapioca.Bindings;
+import hr.codenamecode.tapioca.ExceptionHandler;
 import hr.codenamecode.tapioca.Request;
 import hr.codenamecode.tapioca.RequestHandler;
 import jakarta.servlet.ServletException;
@@ -69,12 +70,15 @@ public class Processor extends HttpServlet {
         resp.flushBuffer();
       }
     } catch (Exception e) {
-      Bindings.getExceptionHandler().handleException(e, apiReq, apiResp);
-      try {
-        if (!resp.isCommitted()) {
-          resp.flushBuffer();
+      ExceptionHandler exceptionHandler = Bindings.getExceptionHandler();
+      if (exceptionHandler != null) {
+        exceptionHandler.handleException(e, apiReq, apiResp);
+        try {
+          if (!resp.isCommitted()) {
+            resp.flushBuffer();
+          }
+        } catch (IOException ignored) {
         }
-      } catch (IOException ignored) {
       }
     }
   }

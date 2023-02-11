@@ -21,18 +21,20 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApiTest {
 
-  static Tomcat tomcat;
+  Tomcat tomcat;
   public static final List<Car> CARS = new ArrayList<>(1);
-  static final int PORT = 11112;
-  static final URI uri = URI.create("http://localhost:%d/".formatted(PORT));
+  final int PORT = 11112;
+  final URI uri = URI.create("http://localhost:%d/".formatted(PORT));
 
   @BeforeAll
-  public static void setup() throws Exception {
+  public void setup() throws Exception {
     tomcat = new Tomcat();
     tomcat.setBaseDir(Path.of(new File("").getAbsolutePath()).resolve("target").toString());
     tomcat.setPort(11112);
@@ -45,7 +47,7 @@ public class ApiTest {
   }
 
   @AfterAll
-  public static void teardown() throws Exception {
+  public void teardown() throws Exception {
     tomcat.stop();
   }
 
@@ -152,19 +154,38 @@ public class ApiTest {
 
   @Test
   @Order(10)
-  public void should_use_exception_handler() throws IOException, InterruptedException {
+  public void default_exception_handler_should_report_500_for_non_APIException()
+      throws IOException, InterruptedException {
+    HttpClient httpClient = HttpClient.newHttpClient();
+
     HttpRequest throwex =
-        HttpRequest.newBuilder(uri.resolve("exts/").resolve("throwex")).GET().build();
+        HttpRequest.newBuilder(uri.resolve("exts/").resolve("throwex?type=illegal")).GET().build();
 
-    HttpResponse<String> response =
-        HttpClient.newHttpClient().send(throwex, HttpResponse.BodyHandlers.ofString());
+    HttpResponse<String> response = httpClient.send(throwex, HttpResponse.BodyHandlers.ofString());
 
+    // Does not reveal exception message, just reports http status 500
     assertEquals(500, response.statusCode());
-    assertEquals("Illegal argument", response.body());
+    assertEquals("", response.body());
   }
 
   @Test
-  @Order(11)
+  @Order(15)
+  public void
+      default_exception_handler_should_report_http_status_and_message_from_thrown_APIException()
+          throws IOException, InterruptedException {
+    HttpClient httpClient = HttpClient.newHttpClient();
+
+    HttpRequest throwex =
+        HttpRequest.newBuilder(uri.resolve("exts/").resolve("throwex?type=api")).GET().build();
+
+    HttpResponse<String> response = httpClient.send(throwex, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(501, response.statusCode());
+    assertEquals("API exception", response.body());
+  }
+
+  @Test
+  @Order(20)
   public void should_use_inline_web_method_implementation()
       throws IOException, InterruptedException {
     HttpRequest inlineImpl =
@@ -178,7 +199,7 @@ public class ApiTest {
   }
 
   @Test
-  @Order(12)
+  @Order(30)
   public void should_return_context_object() throws IOException, InterruptedException {
     HttpRequest contextObject =
         HttpRequest.newBuilder(uri.resolve("exts/").resolve("contextObject")).GET().build();
