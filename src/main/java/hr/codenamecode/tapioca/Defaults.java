@@ -34,12 +34,8 @@ public class Defaults {
         if (e == null || resp == null) return;
         try {
           if (e instanceof ApiException apiException) {
-            if (apiException.isSilent()) {
-              req.getServletContext()
-                  .log("Silently logging API exception: [%s]".formatted(e.getMessage()));
-            } else {
-              req.getServletContext().log(ERROR_LOG_MESSAGE, e);
-            }
+            req.getServletContext()
+                .log("API exception: [%s]".formatted(e.getMessage()));
             resp.setStatus(apiException.getStatus());
             resp.getWriter().write(e.getMessage());
           } else {

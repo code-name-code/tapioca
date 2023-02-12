@@ -46,10 +46,7 @@ public class Request extends HttpServletRequestWrapper {
    */
   public Optional<String> getPathParam(String name) {
     if (pathMatcher == null) {
-      ApiException apiException = new ApiException(SC_BAD_REQUEST, "Path matcher is not provided");
-      // We do not want to log this as an excetion, just leave INFO in the log
-      apiException.setSilent(true);
-      throw apiException;
+      throw new ApiException(SC_BAD_REQUEST, "Path matcher is not provided");
     }
 
     try {

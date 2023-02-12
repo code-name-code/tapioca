@@ -16,7 +16,6 @@ import hr.codenamecode.tapioca.internal.Processor;
 public class ApiException extends RuntimeException {
 
   private final int status;
-  private boolean silent = false;
 
   public ApiException(int status) {
     this.status = status;
@@ -39,24 +38,5 @@ public class ApiException extends RuntimeException {
 
   public int getStatus() {
     return status;
-  }
-
-  public boolean isSilent() {
-    return silent;
-  }
-
-  /**
-   * Sometimes you may wish to avoid printing full {@link ApiException} stack trace and just leave
-   * an INFO note. This is the case where you use {@link ApiException} as a control mechanism and
-   * you know what you are doing. An example would be handling of path parameter by {@link
-   * Request#getPathParam(java.lang.String)} method.
-   *
-   * <p>NOTE: This only applies if you are using default exception handler.
-   *
-   * @param silent If set to true, exception is logged with level INFO and there will be no stack
-   *     trace in the log, otherwise, log level SEVERE is used along with stack trace.
-   */
-  public void setSilent(boolean silent) {
-    this.silent = silent;
   }
 }
