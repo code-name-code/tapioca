@@ -64,6 +64,9 @@ public class Request extends HttpServletRequestWrapper {
    * If conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status
    * is thrown.
    *
+   * <p>NOTE: This method requires {@link Api#jsonReader} to be set. Use {@link
+   * Api#setJsonReader(java.util.function.BiFunction)} to set it.
+   *
    * @param <T>
    * @param clazz Targeted object instance class
    * @return An instance of parameter clazz

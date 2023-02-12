@@ -41,6 +41,9 @@ public class Response extends HttpServletResponseWrapper {
   /**
    * Send JSON response
    *
+   * <p>NOTE: This method requires {@link Api#jsonWriter} to be set. Use {@link
+   * Api#setJsonWriter(java.util.function.Function)} to set it.
+   *
    * @param status Response status
    * @param data Data to be written to the response output stream. This data should be JSON
    *     compatible.
