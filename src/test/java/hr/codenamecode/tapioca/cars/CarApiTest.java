@@ -33,7 +33,7 @@ public class CarApiTest {
   Http http;
 
   @Test
-  @Order(1)
+  @Order(10)
   public void should_return_an_empty_list_of_cars() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars");
 
@@ -42,7 +42,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(2)
+  @Order(20)
   public void should_create_new_car() throws IOException, InterruptedException {
     HttpResponse<String> response = http.post("cars", "{\"brand\":\"Porsche\"}");
 
@@ -51,7 +51,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(3)
+  @Order(30)
   public void should_return_a_list_of_single_car() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars");
 
@@ -60,7 +60,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(4)
+  @Order(40)
   public void should_resolve_path_parameter() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars/Porsche");
 
@@ -69,7 +69,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(5)
+  @Order(50)
   public void should_return_404_for_undefined_path() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("undefined");
 
@@ -77,7 +77,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(6)
+  @Order(60)
   public void filter_should_be_triggered_for_registered_uri()
       throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars");
@@ -86,7 +86,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(7)
+  @Order(70)
   public void should_map_delete_method() throws IOException, InterruptedException {
     HttpResponse<String> response = http.delete("cars/Porsche");
 
@@ -94,7 +94,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(8)
+  @Order(80)
   public void should_map_put_method() throws IOException, InterruptedException {
     HttpResponse<String> response = http.put("cars", "");
 
@@ -102,7 +102,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(10)
+  @Order(90)
   public void default_exception_handler_should_report_500_for_non_APIException()
       throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/throwex?type=illegal");
@@ -113,7 +113,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(15)
+  @Order(100)
   public void
       default_exception_handler_should_report_http_status_and_message_from_thrown_APIException()
           throws IOException, InterruptedException {
@@ -124,7 +124,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(20)
+  @Order(110)
   public void should_use_inline_web_method_implementation()
       throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/inlineImpl");
@@ -134,7 +134,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(30)
+  @Order(120)
   public void should_return_context_object() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/contextObject");
 
@@ -143,7 +143,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(40)
+  @Order(130)
   public void should_download_file(@TempDir Path path) throws IOException, InterruptedException {
     // Create temporary files
     Path catalogPath = path.resolve("catalog.txt");
@@ -168,7 +168,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(50)
+  @Order(140)
   public void should_stream_data() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars/stream");
 
