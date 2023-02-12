@@ -138,7 +138,7 @@ public class CarApiTest {
   }
 
   @Test
-  @Order(30)
+  @Order(40)
   public void should_download_file(@TempDir Path path) throws IOException, InterruptedException {
     // Create temporary files
     Path catalogPath = path.resolve("catalog.txt");
