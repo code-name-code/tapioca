@@ -123,7 +123,8 @@ public abstract class Api implements ServletContextListener {
 
   /**
    * Set exception handler. If no exception handler is set, a default one is used, {@link
-   * Defaults#DEFAULT_EXCEPTION_HANDLER}
+   * Defaults#DEFAULT_EXCEPTION_HANDLER}. If you set a custom exception handler make sure you handle
+   * all cases.
    *
    * @param exceptionHandler {@link ExceptionHandler}
    * @throws NullPointerException

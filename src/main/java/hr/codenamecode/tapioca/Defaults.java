@@ -7,6 +7,8 @@ import java.util.function.Function;
 
 public class Defaults {
 
+  private static final String ERROR_LOG_MESSAGE = "An error ocurred in the processor servlet";
+
   public static final Function<Class<? extends RequestHandler>, RequestHandler>
       DEFAULT_REQUEST_HANDLER_FACTORY =
           requestHandlerClass -> {
@@ -22,14 +24,26 @@ public class Defaults {
             }
           };
 
+  /**
+   * Default exception handler will write HTTP status and message received from {@link ApiException}
+   * to the underlying servlet output stream. All other {@link Exception} are considered unhandled
+   * and will only report HTTP status 500.
+   */
   public static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER =
       (e, req, resp) -> {
         if (e == null || resp == null) return;
         try {
           if (e instanceof ApiException apiException) {
+            if (apiException.isSilent()) {
+              req.getServletContext()
+                  .log("Silently logging API exception: [%s]".formatted(e.getMessage()));
+            } else {
+              req.getServletContext().log(ERROR_LOG_MESSAGE, e);
+            }
             resp.setStatus(apiException.getStatus());
             resp.getWriter().write(e.getMessage());
           } else {
+            req.getServletContext().log(ERROR_LOG_MESSAGE, e);
             resp.setStatus(SC_INTERNAL_SERVER_ERROR);
           }
         } catch (IOException ignored) {
