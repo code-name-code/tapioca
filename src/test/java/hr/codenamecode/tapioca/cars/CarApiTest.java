@@ -4,18 +4,20 @@ import hr.codenamecode.tapioca.internal.Http;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import hr.codenamecode.tapioca.cars.Car;
-import hr.codenamecode.tapioca.cars.CarApi;
 import hr.codenamecode.tapioca.internal.TapiocaTest;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 
 @TapiocaTest(listeners = {CarApi.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -133,5 +135,30 @@ public class CarApiTest {
 
     assertEquals(200, response.statusCode());
     assertEquals("ok", response.body());
+  }
+
+  @Test
+  @Order(30)
+  public void should_download_file(@TempDir Path path) throws IOException, InterruptedException {
+    // Create temporary files
+    Path catalogPath = path.resolve("catalog.txt");
+    Files.writeString(catalogPath, "Mazda,Suzuki", StandardOpenOption.CREATE_NEW);
+
+    // Placeholder download file
+    Path downloadedCatalogPath = path.resolve("downloaded_catalog.txt");
+    Files.writeString(downloadedCatalogPath, "Mazda,Suzuki", StandardOpenOption.CREATE_NEW);
+
+    HttpResponse<Path> response =
+        http.download(
+            "cars/download?path="
+                + URLEncoder.encode(catalogPath.toString(), StandardCharsets.UTF_8),
+            path);
+
+    assertEquals(200, response.statusCode());
+    assertEquals(
+        "attachment; filename=downloaded_catalog.txt",
+        response.headers().firstValue("Content-Disposition").get());
+    assertEquals(downloadedCatalogPath.toString(), response.body().toString());
+    assertEquals("Mazda,Suzuki", Files.readString(downloadedCatalogPath));
   }
 }

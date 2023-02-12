@@ -50,7 +50,7 @@ public class Response extends HttpServletResponseWrapper {
   }
 
   /**
-   * Sends file response
+   * Sends file response. Closes given input stream.
    *
    * @param inputStream File to be downloaded in the form of {@link InputStream}
    * @param attachment If set to true, The first parameter in the HTTP context will be set to
@@ -62,18 +62,21 @@ public class Response extends HttpServletResponseWrapper {
   public void file(
       InputStream inputStream, boolean attachment, String contentType, String filename) {
     try {
-      ServletOutputStream outputStream = getOutputStream();
+      try (inputStream) {
+        String inlineOrAttachment = attachment ? "attachment" : "inline";
 
-      int c;
-      while ((c = inputStream.read()) != -1) {
-        outputStream.write(c);
-        outputStream.flush();
+        setContentType(contentType);
+        setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
+
+        ServletOutputStream outputStream = getOutputStream();
+
+        int c;
+        while ((c = inputStream.read()) != -1) {
+          outputStream.write(c);
+          outputStream.flush();
+        }
       }
 
-      String inlineOrAttachment = attachment ? "attachment" : "inline";
-
-      setContentType(contentType);
-      setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
       setStatus(SC_OK);
     } catch (IOException e) {
       throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);

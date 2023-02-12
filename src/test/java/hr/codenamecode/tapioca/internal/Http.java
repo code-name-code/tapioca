@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class Http {
 
@@ -52,6 +54,16 @@ public class Http {
             .build();
     try {
       return client.send(req, HttpResponse.BodyHandlers.ofString());
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e.getMessage());
+    }
+  }
+
+  public HttpResponse<Path> download(String uri, Path directory) {
+    HttpRequest req = HttpRequest.newBuilder(base.resolve(uri)).GET().build();
+    try {
+      return client.send(
+          req, HttpResponse.BodyHandlers.ofFileDownload(directory, StandardOpenOption.WRITE));
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e.getMessage());
     }

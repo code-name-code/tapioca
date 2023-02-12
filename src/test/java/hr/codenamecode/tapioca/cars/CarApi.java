@@ -4,6 +4,7 @@ import hr.codenamecode.tapioca.Api;
 import hr.codenamecode.tapioca.Bindings;
 import hr.codenamecode.tapioca.cars.requesthandler.CreateCar;
 import hr.codenamecode.tapioca.cars.requesthandler.DeleteCarByBrand;
+import hr.codenamecode.tapioca.cars.requesthandler.DownloadCarCatalog;
 import hr.codenamecode.tapioca.cars.requesthandler.GetAllCars;
 import hr.codenamecode.tapioca.cars.requesthandler.GetCarByBrand;
 import hr.codenamecode.tapioca.cars.requesthandler.ThrowEx;
@@ -46,6 +47,7 @@ public class CarApi extends Api {
     servlet(
         api -> {
           api.get(GetAllCars.class);
+          api.get("download", DownloadCarCatalog.class);
           api.get("(?<brand>\\w+)", GetCarByBrand.class);
           api.post(CreateCar.class);
           api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
