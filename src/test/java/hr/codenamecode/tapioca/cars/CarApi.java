@@ -7,6 +7,7 @@ import hr.codenamecode.tapioca.cars.requesthandler.DeleteCarByBrand;
 import hr.codenamecode.tapioca.cars.requesthandler.DownloadCarCatalog;
 import hr.codenamecode.tapioca.cars.requesthandler.GetAllCars;
 import hr.codenamecode.tapioca.cars.requesthandler.GetCarByBrand;
+import hr.codenamecode.tapioca.cars.requesthandler.StreamData;
 import hr.codenamecode.tapioca.cars.requesthandler.ThrowEx;
 import hr.codenamecode.tapioca.cars.requesthandler.UpdateCar;
 import jakarta.json.bind.Jsonb;
@@ -48,6 +49,7 @@ public class CarApi extends Api {
         api -> {
           api.get(GetAllCars.class);
           api.get("download", DownloadCarCatalog.class);
+          api.get("stream", StreamData.class);
           api.get("(?<brand>\\w+)", GetCarByBrand.class);
           api.post(CreateCar.class);
           api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);

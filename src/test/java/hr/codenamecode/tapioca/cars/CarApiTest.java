@@ -161,4 +161,14 @@ public class CarApiTest {
     assertEquals(downloadedCatalogPath.toString(), response.body().toString());
     assertEquals("Mazda,Suzuki", Files.readString(downloadedCatalogPath));
   }
+
+  @Test
+  @Order(50)
+  public void should_stream_data() throws IOException, InterruptedException {
+    HttpResponse<String> response = http.get("cars/stream");
+
+    assertEquals(200, response.statusCode());
+    assertEquals("application/octet-stream", response.headers().firstValue("Content-Type").get());
+    assertEquals("data", response.body());
+  }
 }

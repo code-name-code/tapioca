@@ -50,7 +50,7 @@ public class Response extends HttpServletResponseWrapper {
   }
 
   /**
-   * Sends file response. Closes given input stream.
+   * Writes file's byte stream to the response. Closes given input stream.
    *
    * @param inputStream File to be downloaded in the form of {@link InputStream}
    * @param attachment If set to true, The first parameter in the HTTP context will be set to
@@ -67,6 +67,32 @@ public class Response extends HttpServletResponseWrapper {
 
         setContentType(contentType);
         setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
+
+        ServletOutputStream outputStream = getOutputStream();
+
+        int c;
+        while ((c = inputStream.read()) != -1) {
+          outputStream.write(c);
+          outputStream.flush();
+        }
+      }
+
+      setStatus(SC_OK);
+    } catch (IOException e) {
+      throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
+    }
+  }
+
+  /**
+   * Writes input stream to the response
+   *
+   * @param inputStream
+   * @param contentType
+   */
+  public void stream(InputStream inputStream, String contentType) {
+    try {
+      try (inputStream) {
+        setContentType(contentType);
 
         ServletOutputStream outputStream = getOutputStream();
 
