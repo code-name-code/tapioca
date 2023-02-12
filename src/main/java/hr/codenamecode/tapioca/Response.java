@@ -34,12 +34,12 @@ public class Response extends HttpServletResponseWrapper {
         getOutputStream().write(data);
       }
     } catch (IOException e) {
-      throw new ApiException(SC_INTERNAL_SERVER_ERROR);
+      throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
   /**
-   * Send json response
+   * Send JSON response
    *
    * @param status Response status
    * @param data Data to be written to the response output stream. This data should be JSON
@@ -58,23 +58,26 @@ public class Response extends HttpServletResponseWrapper {
    * @param contentType Content type
    * @param filename When used in combination with Content-Disposition: attachment, it is used as
    *     the default filename for an eventual "Save As" dialog presented to the user
-   * @throws IOException
    */
-  public void file(InputStream inputStream, boolean attachment, String contentType, String filename)
-      throws IOException {
-    ServletOutputStream outputStream = getOutputStream();
+  public void file(
+      InputStream inputStream, boolean attachment, String contentType, String filename) {
+    try {
+      ServletOutputStream outputStream = getOutputStream();
 
-    int c;
-    while ((c = inputStream.read()) != -1) {
-      outputStream.write(c);
-      outputStream.flush();
+      int c;
+      while ((c = inputStream.read()) != -1) {
+        outputStream.write(c);
+        outputStream.flush();
+      }
+
+      String inlineOrAttachment = attachment ? "attachment" : "inline";
+
+      setContentType(contentType);
+      setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
+      setStatus(SC_OK);
+    } catch (IOException e) {
+      throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
     }
-
-    String inlineOrAttachment = attachment ? "attachment" : "inline";
-
-    setContentType(contentType);
-    setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
-    setStatus(SC_OK);
   }
 
   private String json(Object data) {
