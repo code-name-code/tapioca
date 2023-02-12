@@ -1,4 +1,4 @@
-package hr.codenamecode.tapioca;
+package hr.codenamecode.tapioca.cars;
 
 import hr.codenamecode.tapioca.internal.Http;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
