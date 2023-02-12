@@ -5,6 +5,11 @@ import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hr.codenamecode.tapioca.internal.TapiocaTest;
+import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
@@ -32,7 +37,7 @@ public class CarApiTest {
   public void should_return_an_empty_list_of_cars() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("[]", response.body());
   }
 
@@ -41,7 +46,7 @@ public class CarApiTest {
   public void should_create_new_car() throws IOException, InterruptedException {
     HttpResponse<String> response = http.post("cars", "{\"brand\":\"Porsche\"}");
 
-    assertEquals(201, response.statusCode());
+    assertEquals(SC_CREATED, response.statusCode());
     assertEquals("Created new Porsche", response.body());
   }
 
@@ -50,7 +55,7 @@ public class CarApiTest {
   public void should_return_a_list_of_single_car() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("[{\"brand\":\"Porsche\"}]", response.body());
   }
 
@@ -59,7 +64,7 @@ public class CarApiTest {
   public void should_resolve_path_parameter() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars/Porsche");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("{\"brand\":\"Porsche\"}", response.body());
   }
 
@@ -68,7 +73,7 @@ public class CarApiTest {
   public void should_return_404_for_undefined_path() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("undefined");
 
-    assertEquals(404, response.statusCode());
+    assertEquals(SC_NOT_FOUND, response.statusCode());
   }
 
   @Test
@@ -103,7 +108,7 @@ public class CarApiTest {
     HttpResponse<String> response = http.get("exts/throwex?type=illegal");
 
     // Does not reveal exception message, just reports http status 500
-    assertEquals(500, response.statusCode());
+    assertEquals(SC_INTERNAL_SERVER_ERROR, response.statusCode());
     assertEquals("", response.body());
   }
 
@@ -114,7 +119,7 @@ public class CarApiTest {
           throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/throwex?type=api");
 
-    assertEquals(501, response.statusCode());
+    assertEquals(SC_NOT_IMPLEMENTED, response.statusCode());
     assertEquals("API exception", response.body());
   }
 
@@ -124,7 +129,7 @@ public class CarApiTest {
       throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/inlineImpl");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("inlineImpl", response.body());
   }
 
@@ -133,7 +138,7 @@ public class CarApiTest {
   public void should_return_context_object() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("exts/contextObject");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("ok", response.body());
   }
 
@@ -154,7 +159,7 @@ public class CarApiTest {
                 + URLEncoder.encode(catalogPath.toString(), StandardCharsets.UTF_8),
             path);
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals(
         "attachment; filename=downloaded_catalog.txt",
         response.headers().firstValue("Content-Disposition").get());
@@ -167,7 +172,7 @@ public class CarApiTest {
   public void should_stream_data() throws IOException, InterruptedException {
     HttpResponse<String> response = http.get("cars/stream");
 
-    assertEquals(200, response.statusCode());
+    assertEquals(SC_OK, response.statusCode());
     assertEquals("application/octet-stream", response.headers().firstValue("Content-Type").get());
     assertEquals("data", response.body());
   }
