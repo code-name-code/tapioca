@@ -51,6 +51,7 @@ public class CarApi extends Api {
           api.delete("(?<brand>\\w+)", DeleteCarByBrand.class);
           api.put(UpdateCar.class);
         },
+        "/cars",
         "/cars/*");
   }
 }
