@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 
 /**
@@ -45,7 +46,7 @@ public class Request extends HttpServletRequestWrapper {
    */
   public Optional<String> getPathParam(String name) {
     if (pathMatcher == null) {
-      throw new IllegalStateException("Path matcher is not provided");
+      throw new ApiException(SC_BAD_REQUEST, "Path matcher is not provided");
     }
 
     try {
@@ -71,9 +72,10 @@ public class Request extends HttpServletRequestWrapper {
   public <T> T json(Class<T> clazz) {
     try {
       byte[] content = getInputStream().readAllBytes();
-      return (T) Bindings.getJsonReader().apply(new String(content), clazz);
+      BiFunction<String, Class<?>, ?> jsonReader = Bindings.getJsonReader();
+      return (T) jsonReader.apply(new String(content), clazz);
     } catch (IOException e) {
-      throw new ApiException(SC_BAD_REQUEST);
+      throw new ApiException(SC_BAD_REQUEST, e);
     }
   }
 }
