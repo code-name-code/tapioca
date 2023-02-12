@@ -1,7 +1,6 @@
 package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.Processor;
-import hr.codenamecode.tapioca.internal.ServletConfigurer;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,5 +1,6 @@
 package hr.codenamecode.tapioca.internal;
 
+import hr.codenamecode.tapioca.ServletConfigurer;
 import hr.codenamecode.tapioca.Response;
 import hr.codenamecode.tapioca.Bindings;
 import hr.codenamecode.tapioca.ExceptionHandler;

@@ -2,7 +2,6 @@ package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.FilterDef;
 import hr.codenamecode.tapioca.internal.Processor;
-import hr.codenamecode.tapioca.internal.ServletConfigurer;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
