@@ -1,6 +1,7 @@
 package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.RequestHandlerHolder;
+import static hr.codenamecode.tapioca.internal.URIs.stripSlashes;
 import jakarta.servlet.MultipartConfigElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -201,14 +202,5 @@ public class ServletConfigurer {
 
   public Map<String, String> getInitParameters() {
     return initParameters;
-  }
-
-  private String stripSlashes(String path) {
-    int start = path.startsWith("/") ? 1 : 0;
-    if (path.length() == 1) {
-      return path.substring(start);
-    }
-    int end = path.endsWith("/") ? path.length() - 1 : path.length();
-    return path.substring(start, end);
   }
 }
