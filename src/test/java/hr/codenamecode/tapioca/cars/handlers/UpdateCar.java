@@ -1,4 +1,4 @@
-package hr.codenamecode.tapioca.cars.requesthandler;
+package hr.codenamecode.tapioca.cars.handlers;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 

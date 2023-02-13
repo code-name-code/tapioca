@@ -1,4 +1,4 @@
-package hr.codenamecode.tapioca.cars.requesthandler;
+package hr.codenamecode.tapioca.cars.handlers;
 
 import hr.codenamecode.tapioca.Request;
 import hr.codenamecode.tapioca.RequestHandler;
