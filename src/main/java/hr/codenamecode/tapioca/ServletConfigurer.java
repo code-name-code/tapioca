@@ -1,6 +1,5 @@
 package hr.codenamecode.tapioca;
 
-import hr.codenamecode.tapioca.RequestHandler;
 import hr.codenamecode.tapioca.internal.RequestHandlerHolder;
 import jakarta.servlet.MultipartConfigElement;
 import java.util.HashMap;
