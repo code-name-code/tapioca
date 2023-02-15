@@ -1,10 +1,10 @@
 package hr.codenamecode.tapioca.cars;
 
-import hr.codenamecode.tapioca.internal.TapiocaHttpTestClient;
+import hr.codenamecode.tapioca.TapiocaHttpTestClient;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import hr.codenamecode.tapioca.internal.TapiocaTest;
+import hr.codenamecode.tapioca.TapiocaTest;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;

@@ -1,4 +1,4 @@
-package hr.codenamecode.tapioca.internal;
+package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.Api;
 import java.lang.annotation.ElementType;

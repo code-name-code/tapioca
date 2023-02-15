@@ -1,4 +1,4 @@
-package hr.codenamecode.tapioca.internal;
+package hr.codenamecode.tapioca;
 
 import java.io.IOException;
 import java.net.URI;
