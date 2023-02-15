@@ -41,7 +41,7 @@ public class TapiocaTomcatTestExtension implements BeforeAllCallback, AfterAllCa
       URI baseUri =
           URI.create("http://" + tapiocaTest.hostname() + ":" + port + tapiocaTest.contextPath());
       setDeclaredField(context, "base", baseUri);
-      setDeclaredField(context, "http", new Http(baseUri));
+      setDeclaredField(context, "http", new TapiocaHttpTestClient(baseUri));
 
       tomcat.start();
     }

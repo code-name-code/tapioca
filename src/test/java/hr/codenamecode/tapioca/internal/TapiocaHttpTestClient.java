@@ -8,12 +8,12 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class Http {
+public class TapiocaHttpTestClient {
 
   HttpClient client = HttpClient.newHttpClient();
   URI base;
 
-  public Http(URI base) {
+  public TapiocaHttpTestClient(URI base) {
     this.base = base;
   }
 
