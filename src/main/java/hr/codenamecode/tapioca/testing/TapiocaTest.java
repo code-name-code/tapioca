@@ -1,5 +1,6 @@
-package hr.codenamecode.tapioca;
+package hr.codenamecode.tapioca.testing;
 
+import hr.codenamecode.tapioca.Api;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
