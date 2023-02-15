@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class TapiocaTestExtension implements BeforeAllCallback, AfterAllCallback {
+public class TapiocaTomcatTestExtension implements BeforeAllCallback, AfterAllCallback {
 
   private Tomcat tomcat;
 
@@ -28,6 +28,7 @@ public class TapiocaTestExtension implements BeforeAllCallback, AfterAllCallback
 
       String port = System.getProperty("tomcat.port", String.valueOf(tapiocaTest.port()));
       tomcat.setPort(Integer.parseInt(port));
+      tomcat.setHostname(tapiocaTest.hostname());
 
       tomcat.getConnector();
 
@@ -37,24 +38,10 @@ public class TapiocaTestExtension implements BeforeAllCallback, AfterAllCallback
         tomcatContext.addApplicationListener(listener.getName());
       }
 
-      URI baseUri = URI.create("http://localhost:" + port + tapiocaTest.contextPath());
-      try {
-        Field base = context.getTestInstance().get().getClass().getDeclaredField("base");
-        if (base != null) {
-          base.setAccessible(true);
-          base.set(context.getTestInstance().get(), baseUri);
-        }
-      } catch (NoSuchFieldException ignored) {
-      }
-
-      try {
-        Field http = context.getTestInstance().get().getClass().getDeclaredField("http");
-        if (http != null) {
-          http.setAccessible(true);
-          http.set(context.getTestInstance().get(), new Http(baseUri));
-        }
-      } catch (NoSuchFieldException e) {
-      }
+      URI baseUri =
+          URI.create("http://" + tapiocaTest.hostname() + ":" + port + tapiocaTest.contextPath());
+      setDeclaredField(context, "base", baseUri);
+      setDeclaredField(context, "http", new Http(baseUri));
 
       tomcat.start();
     }
@@ -63,5 +50,17 @@ public class TapiocaTestExtension implements BeforeAllCallback, AfterAllCallback
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
     tomcat.stop();
+  }
+
+  private void setDeclaredField(ExtensionContext context, String name, Object value)
+      throws IllegalArgumentException, IllegalAccessException {
+    try {
+      Field base = context.getTestInstance().get().getClass().getDeclaredField(name);
+      if (base != null) {
+        base.setAccessible(true);
+        base.set(context.getTestInstance().get(), value);
+      }
+    } catch (NoSuchFieldException ignored) {
+    }
   }
 }

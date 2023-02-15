@@ -9,9 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(TapiocaTestExtension.class)
+@ExtendWith(TapiocaTomcatTestExtension.class)
 public @interface TapiocaTest {
   int port() default 11111;
+
+  String hostname() default "localhost";
 
   String contextPath() default "/";
 
