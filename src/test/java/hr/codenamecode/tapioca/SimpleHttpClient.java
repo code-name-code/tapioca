@@ -8,12 +8,18 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class TapiocaHttpTestClient {
+public class SimpleHttpClient {
 
-  HttpClient client = HttpClient.newHttpClient();
-  URI base;
+  private final HttpClient client;
+  private final URI base;
 
-  public TapiocaHttpTestClient(URI base) {
+  public SimpleHttpClient(URI base) {
+    this.client = HttpClient.newHttpClient();
+    this.base = base;
+  }
+
+  public SimpleHttpClient(HttpClient client, URI base) {
+    this.client = client;
     this.base = base;
   }
 
@@ -67,5 +73,13 @@ public class TapiocaHttpTestClient {
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e.getMessage());
     }
+  }
+
+  public HttpClient getClient() {
+    return client;
+  }
+
+  public URI getBase() {
+    return base;
   }
 }

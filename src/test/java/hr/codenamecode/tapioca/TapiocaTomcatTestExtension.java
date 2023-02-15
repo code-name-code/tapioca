@@ -1,6 +1,5 @@
 package hr.codenamecode.tapioca;
 
-import hr.codenamecode.tapioca.Api;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -40,8 +39,11 @@ public class TapiocaTomcatTestExtension implements BeforeAllCallback, AfterAllCa
 
       URI baseUri =
           URI.create("http://" + tapiocaTest.hostname() + ":" + port + tapiocaTest.contextPath());
-      setDeclaredField(context, "base", baseUri);
-      setDeclaredField(context, "http", new TapiocaHttpTestClient(baseUri));
+      setDeclaredField(context, tapiocaTest.tapiocaBaseURIFieldName(), baseUri);
+      setDeclaredField(
+          context,
+          tapiocaTest.tapiocaSimpleHttptClientFieldName(),
+          new SimpleHttpClient(baseUri));
 
       tomcat.start();
     }
@@ -61,6 +63,7 @@ public class TapiocaTomcatTestExtension implements BeforeAllCallback, AfterAllCa
         base.set(context.getTestInstance().get(), value);
       }
     } catch (NoSuchFieldException ignored) {
+
     }
   }
 }
