@@ -86,9 +86,11 @@ public class CodenamecodeApi extends Api {
             // api.setUrlPatterns("/*"); you can set url patterns here
             // or in serve method (takes precedence)
 
+            // When you use class reference, instance creation is handled
+            // by the request handler factory
             api.post(HelloWorld.class); // define post method, mapped as "" path
 
-            // Define get method by providing immediate implementation
+            // Define http get method by providing immediate implementation
             api.get("inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inline impl.".getBytes()));
         }, "/*");
     }
