@@ -5,7 +5,11 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
@@ -14,7 +18,8 @@ import org.junit.jupiter.api.extension.TestInstancePreDestroyCallback;
 public class TapiocaTomcatTestExtension
     implements TestInstancePostProcessor, TestInstancePreDestroyCallback {
 
-  private Tomcat tomcat;
+  private final Random portGenerator = new Random();
+  private final Map<Object, Tomcat> tomcats = new ConcurrentHashMap<>();
 
   private void setDeclaredField(Object testInstance, String name, Object value)
       throws IllegalArgumentException, IllegalAccessException {
@@ -34,16 +39,16 @@ public class TapiocaTomcatTestExtension
       throws Exception {
     TapiocaTest tapiocaTest = testInstance.getClass().getAnnotation(TapiocaTest.class);
 
-    tomcat = new Tomcat();
+    Tomcat tomcat = new Tomcat();
+    Connector connector = tomcat.getConnector();
+    connector.setPort(acquirePort());
+    tomcat.setConnector(connector);
 
     Path baseDir = new File("").toPath().resolve("target");
     tomcat.setBaseDir(baseDir.toString());
 
-    String port = System.getProperty("tomcat.port", String.valueOf(tapiocaTest.port()));
-    tomcat.setPort(Integer.parseInt(port));
+    tomcats.put(testInstance, tomcat);
     tomcat.setHostname(tapiocaTest.hostname());
-
-    tomcat.getConnector();
 
     Context tomcatContext = tomcat.addContext(tapiocaTest.contextPath(), null);
 
@@ -52,7 +57,13 @@ public class TapiocaTomcatTestExtension
     }
 
     URI baseUri =
-        URI.create("http://" + tapiocaTest.hostname() + ":" + port + tapiocaTest.contextPath());
+        URI.create(
+            "http://"
+                + tapiocaTest.hostname()
+                + ":"
+                + connector.getPort()
+                + tapiocaTest.contextPath());
+
     setDeclaredField(testInstance, tapiocaTest.tapiocaBaseURIFieldName(), baseUri);
     setDeclaredField(
         testInstance,
@@ -64,8 +75,18 @@ public class TapiocaTomcatTestExtension
 
   @Override
   public void preDestroyTestInstance(ExtensionContext context) throws Exception {
-    if (tomcat != null) {
-      tomcat.stop();
+    Object testInstance = context.getTestInstance().get();
+    Tomcat tomcat = tomcats.get(testInstance);
+    tomcat.stop();
+  }
+
+  private int acquirePort() {
+    int port = portGenerator.nextInt(30000) + 20000;
+    boolean anyMatch =
+        tomcats.values().stream().anyMatch(tomcat -> tomcat.getConnector().getPort() == port);
+    if (anyMatch) {
+      acquirePort();
     }
+    return port;
   }
 }
