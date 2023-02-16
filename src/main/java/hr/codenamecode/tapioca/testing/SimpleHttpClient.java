@@ -23,8 +23,9 @@ public class SimpleHttpClient {
     this.base = base;
   }
 
-  public HttpResponse<String> get(String uri) {
-    HttpRequest req = HttpRequest.newBuilder(base.resolve(uri)).GET().build();
+  public HttpResponse<String> get(String uri, String... headers) {
+    HttpRequest req = getBuilder(uri, headers).GET().build();
+
     try {
       return client.send(req, HttpResponse.BodyHandlers.ofString());
     } catch (IOException | InterruptedException e) {
@@ -32,11 +33,10 @@ public class SimpleHttpClient {
     }
   }
 
-  public HttpResponse<String> post(String uri, String body) {
+  public HttpResponse<String> post(String uri, String body, String... headers) {
     HttpRequest req =
-        HttpRequest.newBuilder(base.resolve(uri))
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+        getBuilder(uri, headers).POST(HttpRequest.BodyPublishers.ofString(body)).build();
+
     try {
       return client.send(req, HttpResponse.BodyHandlers.ofString());
     } catch (IOException | InterruptedException e) {
@@ -44,8 +44,9 @@ public class SimpleHttpClient {
     }
   }
 
-  public HttpResponse<String> delete(String uri) {
-    HttpRequest req = HttpRequest.newBuilder(base.resolve(uri)).DELETE().build();
+  public HttpResponse<String> delete(String uri, String... headers) {
+    HttpRequest req = getBuilder(uri, headers).DELETE().build();
+
     try {
       return HttpClient.newHttpClient().send(req, HttpResponse.BodyHandlers.ofString());
     } catch (IOException | InterruptedException e) {
@@ -53,11 +54,10 @@ public class SimpleHttpClient {
     }
   }
 
-  public HttpResponse<String> put(String uri, String body) {
+  public HttpResponse<String> put(String uri, String body, String... headers) {
     HttpRequest req =
-        HttpRequest.newBuilder(base.resolve(uri))
-            .PUT(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+        getBuilder(uri, headers).PUT(HttpRequest.BodyPublishers.ofString(body)).build();
+
     try {
       return client.send(req, HttpResponse.BodyHandlers.ofString());
     } catch (IOException | InterruptedException e) {
@@ -65,14 +65,25 @@ public class SimpleHttpClient {
     }
   }
 
-  public HttpResponse<Path> download(String uri, Path directory) {
-    HttpRequest req = HttpRequest.newBuilder(base.resolve(uri)).GET().build();
+  public HttpResponse<Path> download(String uri, Path directory, String... headers) {
+    HttpRequest req = getBuilder(uri, headers).GET().build();
+    
     try {
       return client.send(
           req, HttpResponse.BodyHandlers.ofFileDownload(directory, StandardOpenOption.WRITE));
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e.getMessage());
     }
+  }
+
+  private HttpRequest.Builder getBuilder(String uri, String... headers) {
+    HttpRequest.Builder builder = HttpRequest.newBuilder(base.resolve(uri));
+
+    if (headers.length > 0) {
+      builder.headers(headers);
+    }
+
+    return builder;
   }
 
   public HttpClient getClient() {
