@@ -32,9 +32,6 @@ public class HelloWorld implements RequestHandler {
 @WebListener
 public class CodenamecodeApi extends Api {
 
-    // You could use injection here
-    Jsonb jsonb = JsonbBuilder.create();
-
     // DI is also available here
 
     @Override
@@ -64,10 +61,9 @@ public class CodenamecodeApi extends Api {
                     }
                 });
 
-        // In case you wish to use json, you can provide reader and writer to benefit
-        // from ApiResponse in-built helper methods
-        setJsonReader((s, aClass) -> jsonb.fromJson(s, aClass));
-        setJsonWriter(jsonb::toJson);
+        // In case you wish to use json, you can provide read and write methods
+        // via BodyHandler to benefit from ApiResponse in-built helper methods
+        registerBodyHandler(new JsonBodyHandler());
 
         bind("key", "Bind anything to the servlet context as attribute");
         setInitParameter("name", "Set servlet context initial parameter");
@@ -91,7 +87,11 @@ public class CodenamecodeApi extends Api {
             api.post(HelloWorld.class); // define post method, mapped as "" path
 
             // Define http get method by providing immediate implementation
-            api.get("inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inline impl.".getBytes()));
+            api.get("inlineImpl", (req, resp) -> { 
+                resp.setContentType("text/plain");
+                resp.getWriter().write("inline impl."); 
+                resp.setStatus(200);
+            });
         }, "/*");
     }
 }

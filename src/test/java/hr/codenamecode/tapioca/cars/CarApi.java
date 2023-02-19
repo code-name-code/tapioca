@@ -2,6 +2,7 @@ package hr.codenamecode.tapioca.cars;
 
 import hr.codenamecode.tapioca.Api;
 import hr.codenamecode.tapioca.Bindings;
+import hr.codenamecode.tapioca.MediaType;
 import hr.codenamecode.tapioca.cars.handlers.CreateCar;
 import hr.codenamecode.tapioca.cars.handlers.DeleteCarByBrand;
 import hr.codenamecode.tapioca.cars.handlers.DownloadCarCatalog;
@@ -10,19 +11,14 @@ import hr.codenamecode.tapioca.cars.handlers.GetCarByBrand;
 import hr.codenamecode.tapioca.cars.handlers.StreamData;
 import hr.codenamecode.tapioca.cars.handlers.ThrowEx;
 import hr.codenamecode.tapioca.cars.handlers.UpdateCar;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CarApi extends Api {
 
-  Jsonb jsonb = JsonbBuilder.create();
-
   @Override
   protected void configure() {
 
-    setJsonReader(jsonb::fromJson);
-    setJsonWriter(jsonb::toJson);
+    registerBodyHandler(new JsonBodyHandler());
 
     bind("key", "ok");
 
@@ -37,10 +33,18 @@ public class CarApi extends Api {
         api -> {
           api.get(
               "contextObject",
-              (req, resp) ->
-                  resp.send(200, "text/plain", Bindings.<String>lookup("key").getBytes()));
+              (req, resp) -> {
+                resp.setContentType(MediaType.TEXT_PLAIN);
+                resp.getWriter().write(Bindings.<String>lookup("key"));
+                resp.setStatus(HttpServletResponse.SC_OK);
+              });
           api.get(
-              "inlineImpl", (req, resp) -> resp.send(200, "text/plain", "inlineImpl".getBytes()));
+              "inlineImpl",
+              (req, resp) -> {
+                resp.setContentType(MediaType.TEXT_PLAIN);
+                resp.getWriter().write("inlineImpl");
+                resp.setStatus(HttpServletResponse.SC_OK);
+              });
           api.get("throwex", ThrowEx.class);
         },
         "/exts/*");

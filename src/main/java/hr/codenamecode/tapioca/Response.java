@@ -1,11 +1,9 @@
 package hr.codenamecode.tapioca;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * Wrapper around {@link HttpServletResponse} which provides some additional, convenient methods out
@@ -15,104 +13,61 @@ import java.nio.charset.StandardCharsets;
  */
 public class Response extends HttpServletResponseWrapper {
 
+  public enum ContentDispositionType {
+    ATTACHMENT,
+    INLINE
+  }
+
   public Response(HttpServletResponse response) {
     super(response);
   }
 
   /**
-   * Send generic response
+   * Writes data to the output stream using body handler based on specified content type.
    *
-   * @param status Response status
-   * @param contentType Response content type
-   * @param data Data to be written to the response output stream
-   */
-  public void send(int status, String contentType, byte[] data) {
-    try {
-      addHeader("Content-Type", contentType);
-      setStatus(status);
-      if (data != null) {
-        getOutputStream().write(data);
-      }
-    } catch (IOException e) {
-      throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
-    }
-  }
-
-  /**
-   * Send JSON response
-   *
-   * <p>NOTE: This method requires {@link Api#jsonWriter} to be set. Use {@link
-   * Api#setJsonWriter(java.util.function.Function)} to set it.
-   *
-   * @param status Response status
-   * @param data Data to be written to the response output stream. This data should be JSON
-   *     compatible.
-   */
-  public void json(int status, Object data) {
-    send(status, "application/json", json(data).getBytes(StandardCharsets.UTF_8));
-  }
-
-  /**
-   * Writes file's byte stream to the response. Closes given input stream.
-   *
-   * @param inputStream File to be downloaded in the form of {@link InputStream}
-   * @param attachment If set to true, The first parameter in the HTTP context will be set to
-   *     attachment, otherwise inline
-   * @param contentType Content type
-   * @param filename When used in combination with Content-Disposition: attachment, it is used as
-   *     the default filename for an eventual "Save As" dialog presented to the user
-   */
-  public void file(
-      InputStream inputStream, boolean attachment, String contentType, String filename) {
-    try {
-      try (inputStream) {
-        String inlineOrAttachment = attachment ? "attachment" : "inline";
-
-        setContentType(contentType);
-        setHeader("Content-Disposition", "%s; filename=%s".formatted(inlineOrAttachment, filename));
-
-        ServletOutputStream outputStream = getOutputStream();
-
-        int c;
-        while ((c = inputStream.read()) != -1) {
-          outputStream.write(c);
-          outputStream.flush();
-        }
-      }
-
-      setStatus(SC_OK);
-    } catch (IOException e) {
-      throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
-    }
-  }
-
-  /**
-   * Writes input stream to the response
-   *
-   * @param inputStream
+   * @param data
    * @param contentType
    */
-  public void stream(InputStream inputStream, String contentType) {
+  public void setBody(Object data, String contentType) {
+    BodyHandler handler =
+        Objects.requireNonNull(
+            Bindings.getBodyHandlers().get(contentType),
+            "Missing body handler for media type[%s]".formatted(contentType));
+    setBody(data, handler);
+  }
+
+  /**
+   * Writes data to the output stream using body handler based on HTTP Content-Type header.
+   *
+   * @param data
+   */
+  public void setBody(Object data) {
+    setBody(data, getContentType());
+  }
+
+  /**
+   * Writes data to the output stream using specified body handler.
+   *
+   * @param data
+   * @param handler
+   */
+  public void setBody(Object data, BodyHandler handler) {
+    Objects.requireNonNull(handler, "Missing body handler");
     try {
-      try (inputStream) {
-        setContentType(contentType);
-
-        ServletOutputStream outputStream = getOutputStream();
-
-        int c;
-        while ((c = inputStream.read()) != -1) {
-          outputStream.write(c);
-          outputStream.flush();
-        }
-      }
-
-      setStatus(SC_OK);
+      handler.write(data, getOutputStream());
     } catch (IOException e) {
       throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
-  private String json(Object data) {
-    return Bindings.getJsonWriter().apply(data);
+  /**
+   * Convenient method for setting Content-Disposition HTTP header.
+   *
+   * @param filename
+   * @param type
+   */
+  public void setContentDisposition(String filename, ContentDispositionType type) {
+    setHeader(
+        "Content-Disposition", "%s; filename=%s".formatted(type.name().toLowerCase(), filename));
   }
 }

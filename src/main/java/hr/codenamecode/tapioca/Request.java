@@ -5,8 +5,8 @@ import static jakarta.servlet.http.HttpServletResponse.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 
 /**
@@ -35,7 +35,7 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * s e.g.
+   * Get path parameter. e.g.
    *
    * <p>For mapping: <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b> and incoming
    * request: <b>http://localhost:8080/resources/cars/porsche</b> method call <code>
@@ -58,25 +58,46 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * Converts incoming request body into an instance of provided class. This method should be called
-   * only once per request handler otherwise exception will be thrown (stream can be read only
-   * once). This method assumes that incoming request body is of <b>application/json</b> media type.
-   * If conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status
-   * is thrown.
-   *
-   * <p>NOTE: This method requires {@link Api#jsonReader} to be set. Use {@link
-   * Api#setJsonReader(java.util.function.BiFunction)} to set it.
+   * Converts request body to a given type using body handler based on Content-Type HTTP header
+   * value.
    *
    * @param <T>
-   * @param clazz Targeted object instance class
-   * @return An instance of parameter clazz
+   * @param type
+   * @return
    */
-  @SuppressWarnings("unchecked")
-  public <T> T json(Class<T> clazz) {
+  public <T> T getBody(Class<T> type) {
+    return getBody(type, getContentType());
+  }
+
+  /**
+   * Converts request body to a given type using body handler based on specified content type.
+   *
+   * @param <T>
+   * @param type
+   * @param contentType
+   * @return
+   */
+  public <T> T getBody(Class<T> type, String contentType) {
+    BodyHandler handler =
+        Objects.requireNonNull(
+            Bindings.getBodyHandlers().get(contentType),
+            "Missing body handler for media type[%s]".formatted(contentType));
+    return getBody(type, handler);
+  }
+
+  /**
+   * Converts request body to a given type using body handler based on Content-Type HTTP header
+   * value.
+   *
+   * @param <T>
+   * @param type
+   * @param handler
+   * @return
+   */
+  public <T> T getBody(Class<T> type, BodyHandler handler) {
+    Objects.requireNonNull(handler, "Missing body handler");
     try {
-      byte[] content = getInputStream().readAllBytes();
-      BiFunction<String, Class<?>, ?> jsonReader = Bindings.getJsonReader();
-      return (T) jsonReader.apply(new String(content), clazz);
+      return handler.read(getInputStream(), type);
     } catch (IOException e) {
       throw new ApiException(SC_BAD_REQUEST, e);
     }

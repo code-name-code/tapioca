@@ -9,6 +9,18 @@ public class Defaults {
 
   private static final String ERROR_LOG_MESSAGE = "An error ocurred in the processor servlet";
 
+  /**
+   * Default request handler factory. Describes how new request handler instances are created. This
+   * is an entry point for introducing dependency injection frameworks such as Google Guice, CDI
+   * etc. This factory will be used when HTTP method is defined by using URI path and a request
+   * handler class.
+   *
+   * <p>e.g. <code>api.get("cars", GetCars.class);</code>
+   *
+   * <p>e.g. <code>
+   *  setRequestHandlerFactory(requestHandlerClass -> CDI.current().select(requestHandlerClass).get());
+   * </code>
+   */
   public static final Function<Class<? extends RequestHandler>, RequestHandler>
       DEFAULT_REQUEST_HANDLER_FACTORY =
           requestHandlerClass -> {
@@ -34,8 +46,7 @@ public class Defaults {
         if (e == null || resp == null) return;
         try {
           if (e instanceof ApiException apiException) {
-            req.getServletContext()
-                .log("API exception: [%s]".formatted(e.getMessage()));
+            req.getServletContext().log("API exception: [%s]".formatted(e.getMessage()));
             resp.setStatus(apiException.getStatus());
             resp.getWriter().write(e.getMessage());
           } else {

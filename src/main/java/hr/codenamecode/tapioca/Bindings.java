@@ -2,10 +2,10 @@ package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.ServletContext;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -18,37 +18,26 @@ public class Bindings {
 
   private static ServletContext servletContext;
 
-  public static final String SC_JSON_READER = "hr.codenamecode.tapioca.json.reader";
-  public static final String SC_JSON_WRITER = "hr.codenamecode.tapioca.json.writer";
+  public static final String SC_BODY_HANDLERS = "hr.codenamecode.tapioca.body.handlers";
   public static final String SC_REQUEST_HANDLER_FACTORY =
       "hr.codenamecode.tapioca.requesthandler.factory";
   public static final String SC_EXCEPTION_HANDLER = "hr.codenamecode.tapioca.exception.handler";
 
   /**
-   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert incoming JSON
-   * request body into an instance of specified class.
-   *
-   * @return {@link BiFunction} performing conversion
-   * @throws NullPointerException
+   * @return Map of registered body handlers.
    */
-  @SuppressWarnings("unchecked")
-  public static BiFunction<String, Class<?>, ?> getJsonReader() throws NullPointerException {
-    Object reader = servletContext.getAttribute(SC_JSON_READER);
-    return (BiFunction<String, Class<?>, ?>)
-        Objects.requireNonNull(reader, "JSON reader is not provided");
+  public static Map<String, BodyHandler> getBodyHandlers() {
+    return lookup(SC_BODY_HANDLERS);
   }
 
   /**
-   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert objects into
-   * JSON which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
+   * Get body handler for the given media type.
    *
-   * @return {@link Function} performing conversion
-   * @throws NullPointerException
+   * @param mediaType
+   * @return
    */
-  @SuppressWarnings("unchecked")
-  public static Function<Object, String> getJsonWriter() throws NullPointerException {
-    Object writer = servletContext.getAttribute(SC_JSON_WRITER);
-    return (Function<Object, String>) Objects.requireNonNull(writer, "JSON writer is not provided");
+  public static BodyHandler getBodyHandler(String mediaType) {
+    return getBodyHandlers().get(mediaType);
   }
 
   /**

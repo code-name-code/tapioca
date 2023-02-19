@@ -1,5 +1,6 @@
 package hr.codenamecode.tapioca;
 
+import hr.codenamecode.tapioca.internal.OctetStreamBodyHandler;
 import hr.codenamecode.tapioca.internal.FilterDef;
 import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.DispatcherType;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -66,8 +67,7 @@ public abstract class Api implements ServletContextListener {
   private final Map<String, String> initParameters;
 
   private Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory;
-  private BiFunction<String, Class<?>, ?> jsonReader;
-  private Function<Object, String> jsonWriter;
+  private final Map<String, BodyHandler> bodyHandlers = new ConcurrentHashMap<>();
   private ExceptionHandler exceptionHandler;
 
   public Api() {
@@ -78,6 +78,8 @@ public abstract class Api implements ServletContextListener {
 
     this.requestHandlerFactory = Defaults.DEFAULT_REQUEST_HANDLER_FACTORY;
     this.exceptionHandler = Defaults.DEFAULT_EXCEPTION_HANDLER;
+
+    this.bodyHandlers.put(MediaType.APPLICATION_OCTET_STREAM, new OctetStreamBodyHandler());
   }
 
   /** Implement this method to configure servlets, filters etc. */
@@ -98,26 +100,13 @@ public abstract class Api implements ServletContextListener {
   }
 
   /**
-   * Set JSON reading function.
+   * Register new body handler. Body handlers are used when reading from request body or writing to
+   * response body.
    *
-   * @param jsonReader Reader used internally by the Tapioca to convert incoming request body
-   *     containing JSON content into an instance of provided class.
-   * @throws NullPointerException
+   * @param bodyHandler Body handler implementation
    */
-  protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader)
-      throws NullPointerException {
-    this.jsonReader = Objects.requireNonNull(jsonReader);
-  }
-
-  /**
-   * Set JSON writing function.
-   *
-   * @param jsonWriter Used internally by the Tapioca to write JSON content to the {@link Processor}
-   *     output stream.
-   * @throws NullPointerException
-   */
-  protected void setJsonWriter(Function<Object, String> jsonWriter) throws NullPointerException {
-    this.jsonWriter = Objects.requireNonNull(jsonWriter);
+  protected void registerBodyHandler(BodyHandler bodyHandler) {
+    this.bodyHandlers.put(bodyHandler.getMediaType(), bodyHandler);
   }
 
   /**
@@ -262,8 +251,7 @@ public abstract class Api implements ServletContextListener {
    * @param sc {@link ServletContext}
    */
   private void setServletContext(ServletContext sc) {
-    sc.setAttribute(Bindings.SC_JSON_READER, jsonReader);
-    sc.setAttribute(Bindings.SC_JSON_WRITER, jsonWriter);
+    sc.setAttribute(Bindings.SC_BODY_HANDLERS, bodyHandlers);
     sc.setAttribute(Bindings.SC_REQUEST_HANDLER_FACTORY, requestHandlerFactory);
     sc.setAttribute(Bindings.SC_EXCEPTION_HANDLER, exceptionHandler);
 
