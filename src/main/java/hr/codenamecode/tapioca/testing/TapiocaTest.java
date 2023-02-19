@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(TapiocaTomcatTestExtension.class)
+@ExtendWith(TapiocaTestExtension.class)
 public @interface TapiocaTest {
   String hostname() default "localhost";
 

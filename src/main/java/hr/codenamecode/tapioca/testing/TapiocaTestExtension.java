@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.junit.jupiter.api.extension.TestInstancePreDestroyCallback;
 
-public class TapiocaTomcatTestExtension
+public class TapiocaTestExtension
     implements TestInstancePostProcessor, TestInstancePreDestroyCallback {
 
   private final Random portGenerator = new Random();
