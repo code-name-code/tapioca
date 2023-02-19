@@ -44,7 +44,8 @@ public class CarApiTest {
   @Test
   @Order(20)
   public void should_create_new_car() throws IOException, InterruptedException {
-    HttpResponse<String> response = http.post("cars", "{\"brand\":\"Porsche\"}");
+    HttpResponse<String> response =
+        http.post("cars", "{\"brand\":\"Porsche\"}", "Content-Type", "application/json");
 
     assertEquals(SC_CREATED, response.statusCode());
     assertEquals("Created new Porsche", response.body());

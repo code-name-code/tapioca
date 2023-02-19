@@ -66,8 +66,7 @@ public class CodenamecodeApi extends Api {
 
         // In case you wish to use json, you can provide reader and writer to benefit
         // from ApiResponse in-built helper methods
-        setJsonReader((s, aClass) -> jsonb.fromJson(s, aClass));
-        setJsonWriter(jsonb::toJson);
+        setJsonHandlers(jsonb.fromJson, jsonb::toJson);
 
         bind("key", "Bind anything to the servlet context as attribute");
         setInitParameter("name", "Set servlet context initial parameter");

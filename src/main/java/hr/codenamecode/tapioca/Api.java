@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -66,8 +66,8 @@ public abstract class Api implements ServletContextListener {
   private final Map<String, String> initParameters;
 
   private Function<Class<? extends RequestHandler>, RequestHandler> requestHandlerFactory;
-  private BiFunction<String, Class<?>, ?> jsonReader;
-  private Function<Object, String> jsonWriter;
+  private MediaTypeHandler jsonConverter;
+  private Map<String, MediaTypeHandler> mediaTypeHandlers = new ConcurrentHashMap<>();
   private ExceptionHandler exceptionHandler;
 
   public Api() {
@@ -98,26 +98,13 @@ public abstract class Api implements ServletContextListener {
   }
 
   /**
-   * Set JSON reading function.
+   * Register new media type handler. Media type handlers are used when reading from request body or
+   * writing to response body.
    *
-   * @param jsonReader Reader used internally by the Tapioca to convert incoming request body
-   *     containing JSON content into an instance of provided class.
-   * @throws NullPointerException
+   * @param mediaTypeHandler Media type handler implementation
    */
-  protected void setJsonReader(BiFunction<String, Class<?>, ?> jsonReader)
-      throws NullPointerException {
-    this.jsonReader = Objects.requireNonNull(jsonReader);
-  }
-
-  /**
-   * Set JSON writing function.
-   *
-   * @param jsonWriter Used internally by the Tapioca to write JSON content to the {@link Processor}
-   *     output stream.
-   * @throws NullPointerException
-   */
-  protected void setJsonWriter(Function<Object, String> jsonWriter) throws NullPointerException {
-    this.jsonWriter = Objects.requireNonNull(jsonWriter);
+  protected void registerMediaTypeHandler(MediaTypeHandler mediaTypeHandler) {
+    this.mediaTypeHandlers.put(mediaTypeHandler.getMediaType(), mediaTypeHandler);
   }
 
   /**
@@ -262,8 +249,7 @@ public abstract class Api implements ServletContextListener {
    * @param sc {@link ServletContext}
    */
   private void setServletContext(ServletContext sc) {
-    sc.setAttribute(Bindings.SC_JSON_READER, jsonReader);
-    sc.setAttribute(Bindings.SC_JSON_WRITER, jsonWriter);
+    sc.setAttribute(Bindings.SC_MEDIA_TYPE_HANDLERS, mediaTypeHandlers);
     sc.setAttribute(Bindings.SC_REQUEST_HANDLER_FACTORY, requestHandlerFactory);
     sc.setAttribute(Bindings.SC_EXCEPTION_HANDLER, exceptionHandler);
 

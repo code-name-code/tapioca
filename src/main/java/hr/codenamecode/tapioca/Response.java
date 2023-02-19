@@ -20,7 +20,7 @@ public class Response extends HttpServletResponseWrapper {
   }
 
   /**
-   * Send generic response
+   * Send response
    *
    * @param status Response status
    * @param contentType Response content type
@@ -39,6 +39,20 @@ public class Response extends HttpServletResponseWrapper {
   }
 
   /**
+   * Send response using one of the registered media type handlers. Media type handler used depends
+   * on the specified contentType parameter.
+   *
+   * @param status
+   * @param contentType
+   * @param data
+   */
+  public void send(int status, String contentType, Object data) {
+    MediaTypeHandler handler = Bindings.getMediaTypeHandlers().get(contentType);
+    String output = handler.to(data);
+    send(status, contentType, output.getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
    * Send JSON response
    *
    * <p>NOTE: This method requires {@link Api#jsonWriter} to be set. Use {@link
@@ -49,7 +63,10 @@ public class Response extends HttpServletResponseWrapper {
    *     compatible.
    */
   public void json(int status, Object data) {
-    send(status, "application/json", json(data).getBytes(StandardCharsets.UTF_8));
+    String contentType = "application/json";
+    MediaTypeHandler handler = Bindings.getMediaTypeHandlers().get(contentType);
+    String json = handler.to(data);
+    send(status, contentType, json.getBytes(StandardCharsets.UTF_8));
   }
 
   /**
@@ -110,9 +127,5 @@ public class Response extends HttpServletResponseWrapper {
     } catch (IOException e) {
       throw new ApiException(SC_INTERNAL_SERVER_ERROR, e);
     }
-  }
-
-  private String json(Object data) {
-    return Bindings.getJsonWriter().apply(data);
   }
 }

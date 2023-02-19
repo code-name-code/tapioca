@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 
 /**
@@ -35,7 +34,7 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * s e.g.
+   * Get path parameter. e.g.
    *
    * <p>For mapping: <b>http://localhost:8080/resources/cars/(?&lt;name&gt;\w+)</b> and incoming
    * request: <b>http://localhost:8080/resources/cars/porsche</b> method call <code>
@@ -58,27 +57,36 @@ public class Request extends HttpServletRequestWrapper {
   }
 
   /**
-   * Converts incoming request body into an instance of provided class. This method should be called
-   * only once per request handler otherwise exception will be thrown (stream can be read only
-   * once). This method assumes that incoming request body is of <b>application/json</b> media type.
-   * If conversion from JSON to object fails, {@link ApiException} with SC_BAD_REQUEST(400) status
-   * is thrown.
-   *
-   * <p>NOTE: This method requires {@link Api#jsonReader} to be set. Use {@link
-   * Api#setJsonReader(java.util.function.BiFunction)} to set it.
+   * Convert request body to a given type using specified media type handler.
    *
    * @param <T>
-   * @param clazz Targeted object instance class
-   * @return An instance of parameter clazz
+   * @param type
+   * @param handler
+   * @return
    */
-  @SuppressWarnings("unchecked")
-  public <T> T json(Class<T> clazz) {
+  public <T> T body(Class<T> type, MediaTypeHandler handler) {
+    byte[] content;
+
     try {
-      byte[] content = getInputStream().readAllBytes();
-      BiFunction<String, Class<?>, ?> jsonReader = Bindings.getJsonReader();
-      return (T) jsonReader.apply(new String(content), clazz);
+      content = getInputStream().readAllBytes();
     } catch (IOException e) {
       throw new ApiException(SC_BAD_REQUEST, e);
     }
+
+    String input = new String(content);
+    return handler.from(input, type);
+  }
+
+  /**
+   * Convert request body to a given type using media type handler based on Content-Type HTTP header
+   * value.
+   *
+   * @param <T>
+   * @param type
+   * @return
+   */
+  public <T> T body(Class<T> type) {
+    MediaTypeHandler handler = Bindings.getMediaTypeHandlers().get(getContentType());
+    return body(type, handler);
   }
 }

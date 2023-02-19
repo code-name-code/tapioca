@@ -2,10 +2,10 @@ package hr.codenamecode.tapioca;
 
 import hr.codenamecode.tapioca.internal.Processor;
 import jakarta.servlet.ServletContext;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -18,37 +18,16 @@ public class Bindings {
 
   private static ServletContext servletContext;
 
-  public static final String SC_JSON_READER = "hr.codenamecode.tapioca.json.reader";
-  public static final String SC_JSON_WRITER = "hr.codenamecode.tapioca.json.writer";
+  public static final String SC_MEDIA_TYPE_HANDLERS = "hr.codenamecode.tapioca.mediatype.handlers";
   public static final String SC_REQUEST_HANDLER_FACTORY =
       "hr.codenamecode.tapioca.requesthandler.factory";
   public static final String SC_EXCEPTION_HANDLER = "hr.codenamecode.tapioca.exception.handler";
 
   /**
-   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert incoming JSON
-   * request body into an instance of specified class.
-   *
-   * @return {@link BiFunction} performing conversion
-   * @throws NullPointerException
+   * @return Map of registered media type handlers.
    */
-  @SuppressWarnings("unchecked")
-  public static BiFunction<String, Class<?>, ?> getJsonReader() throws NullPointerException {
-    Object reader = servletContext.getAttribute(SC_JSON_READER);
-    return (BiFunction<String, Class<?>, ?>)
-        Objects.requireNonNull(reader, "JSON reader is not provided");
-  }
-
-  /**
-   * Dedicated {@link ServletContext} attribute used by tapioca internally to convert objects into
-   * JSON which can be written to the {@link jakarta.servlet.http.HttpServlet} output stream.
-   *
-   * @return {@link Function} performing conversion
-   * @throws NullPointerException
-   */
-  @SuppressWarnings("unchecked")
-  public static Function<Object, String> getJsonWriter() throws NullPointerException {
-    Object writer = servletContext.getAttribute(SC_JSON_WRITER);
-    return (Function<Object, String>) Objects.requireNonNull(writer, "JSON writer is not provided");
+  public static Map<String, MediaTypeHandler> getMediaTypeHandlers() {
+    return lookup(SC_MEDIA_TYPE_HANDLERS);
   }
 
   /**

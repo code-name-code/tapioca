@@ -10,19 +10,14 @@ import hr.codenamecode.tapioca.cars.handlers.GetCarByBrand;
 import hr.codenamecode.tapioca.cars.handlers.StreamData;
 import hr.codenamecode.tapioca.cars.handlers.ThrowEx;
 import hr.codenamecode.tapioca.cars.handlers.UpdateCar;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CarApi extends Api {
 
-  Jsonb jsonb = JsonbBuilder.create();
-
   @Override
   protected void configure() {
 
-    setJsonReader(jsonb::fromJson);
-    setJsonWriter(jsonb::toJson);
+    registerMediaTypeHandler(new JsonMediaTypeHandler());
 
     bind("key", "ok");
 
