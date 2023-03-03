@@ -40,12 +40,13 @@ public class TapiocaTestExtension
     TapiocaTest tapiocaTest = testInstance.getClass().getAnnotation(TapiocaTest.class);
 
     Tomcat tomcat = new Tomcat();
+    
+    Path baseDir = new File("").toPath().toAbsolutePath().resolve("target");
+    tomcat.setBaseDir(baseDir.toString());
+
     Connector connector = tomcat.getConnector();
     connector.setPort(acquirePort());
     tomcat.setConnector(connector);
-
-    Path baseDir = new File("").toPath().resolve("target");
-    tomcat.setBaseDir(baseDir.toString());
 
     tomcats.put(testInstance, tomcat);
     tomcat.setHostname(tapiocaTest.hostname());
