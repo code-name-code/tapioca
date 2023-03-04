@@ -41,7 +41,8 @@ public class TapiocaTestExtension
 
     Tomcat tomcat = new Tomcat();
     
-    Path baseDir = new File("").toPath().toAbsolutePath().resolve("target");
+    Path projectBasePath = new File("").toPath().toAbsolutePath();
+    Path baseDir = projectBasePath.resolve("target");
     tomcat.setBaseDir(baseDir.toString());
 
     Connector connector = tomcat.getConnector();
