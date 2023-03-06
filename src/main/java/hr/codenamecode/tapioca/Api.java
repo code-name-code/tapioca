@@ -203,7 +203,7 @@ public abstract class Api implements ServletContextListener {
    * @param urlPatterns URL patterns this servlet will be serving
    */
   @SuppressWarnings("ClassEscapesDefinedScope")
-  protected void servlet(ServletConfigurer apiConfigurer, String... urlPatterns) {
+  protected void serve(ServletConfigurer apiConfigurer, String... urlPatterns) {
     apiConfigurer.setUrlPatterns(urlPatterns);
     servlets.add(apiConfigurer);
   }
@@ -213,15 +213,15 @@ public abstract class Api implements ServletContextListener {
    * {@link Processor}. Each call to this method will create a new instance of {@link Processor}.
    * Configuring servlet using this method offers same functionalities as {@link
    * jakarta.servlet.ServletRegistration.Dynamic} through {@link ServletConfigurer}. This method
-   * offers functional alternative to {@link Api#servlet(ServletConfigurer, String[])} method
-   * through {@link Consumer}. This way you provide inline servlet configuration without the need
-   * for creating a separate class.
+   * offers functional alternative to {@link Api#serve(ServletConfigurer, String[])} method through
+   * {@link Consumer}. This way you provide inline servlet configuration without the need for
+   * creating a separate class.
    *
    * @param apiConfigurerConsumer {@link ServletConfigurer} consumer
    * @param urlPatterns URL patterns this servlet will be serving
    */
   @SuppressWarnings("ClassEscapesDefinedScope")
-  protected void servlet(Consumer<ServletConfigurer> apiConfigurerConsumer, String... urlPatterns) {
+  protected void serve(Consumer<ServletConfigurer> apiConfigurerConsumer, String... urlPatterns) {
     ServletConfigurer apiConfigurer = new ServletConfigurer();
     apiConfigurer.setUrlPatterns(urlPatterns);
     apiConfigurerConsumer.accept(apiConfigurer);

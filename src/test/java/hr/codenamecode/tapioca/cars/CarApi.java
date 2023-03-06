@@ -29,7 +29,7 @@ public class CarApi extends Api {
         },
         "/*");
 
-    servlet(
+    serve(
         api -> {
           api.get(
               "contextObject",
@@ -49,7 +49,7 @@ public class CarApi extends Api {
         },
         "/exts/*");
 
-    servlet(
+    serve(
         api -> {
           api.get(GetAllCars.class);
           api.get("download", DownloadCarCatalog.class);
