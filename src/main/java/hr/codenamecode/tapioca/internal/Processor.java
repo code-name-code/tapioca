@@ -66,20 +66,10 @@ public class Processor extends HttpServlet {
 
       method.setServletConfig(getServletConfig());
       method.handle(apiReq, apiResp);
-
-      if (!resp.isCommitted()) {
-        resp.flushBuffer();
-      }
     } catch (Exception e) {
       ExceptionHandler exceptionHandler = Bindings.getExceptionHandler();
       if (exceptionHandler != null) {
         exceptionHandler.handleException(e, apiReq, apiResp);
-        try {
-          if (!resp.isCommitted()) {
-            resp.flushBuffer();
-          }
-        } catch (IOException ignored) {
-        }
       }
     }
   }
