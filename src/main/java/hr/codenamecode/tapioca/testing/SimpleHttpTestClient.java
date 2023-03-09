@@ -8,17 +8,17 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class SimpleHttpClient {
+public class SimpleHttpTestClient {
 
   private final HttpClient client;
   private final URI base;
 
-  public SimpleHttpClient(URI base) {
+  public SimpleHttpTestClient(URI base) {
     this.client = HttpClient.newHttpClient();
     this.base = base;
   }
 
-  public SimpleHttpClient(HttpClient client, URI base) {
+  public SimpleHttpTestClient(HttpClient client, URI base) {
     this.client = client;
     this.base = base;
   }

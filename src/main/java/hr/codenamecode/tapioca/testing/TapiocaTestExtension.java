@@ -70,7 +70,7 @@ public class TapiocaTestExtension
     setDeclaredField(
         testInstance,
         tapiocaTest.tapiocaSimpleHttptClientFieldName(),
-        new SimpleHttpClient(baseUri));
+        new SimpleHttpTestClient(baseUri));
 
     tomcat.start();
   }

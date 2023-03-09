@@ -1,6 +1,6 @@
 package hr.codenamecode.tapioca.cars;
 
-import hr.codenamecode.tapioca.testing.SimpleHttpClient;
+import hr.codenamecode.tapioca.testing.SimpleHttpTestClient;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.io.TempDir;
 public class CarApiTest {
 
   // Automatically set by the TapiocaTestExstension
-  private SimpleHttpClient http;
+  private SimpleHttpTestClient http;
 
   @Test
   @Order(10)
